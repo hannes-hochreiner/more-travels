@@ -1,19 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router } from 'react-router-dom';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
 import LoggerConsole from './LoggerConsole';
-import ListLogic from './ListLogic';
-import ListEntryLogic from './ListEntryLogic';
+import TripListLogic from './TripListLogic';
+import TripListEntryLogic from './TripListEntryLogic';
 
 new LoggerConsole();
-new ListLogic();
-new ListEntryLogic();
+new TripListLogic();
+new TripListEntryLogic();
 
+injectTapEventPlugin();
 ReactDOM.render(
   <Router>
     <App/>
