@@ -19,6 +19,10 @@ export default class TripList extends Component {
     PubSub.publish(`ui.triplist.${this.state.id}.didMount`, this.state);
   }
 
+  componentWillUnmount() {
+    PubSub.unsubscribe(`ui.triplist.${this.state.id}`);
+  }
+
   update(topic, data) {
     this.setState({ trips: data.trips });
   }

@@ -1,4 +1,5 @@
 import PubSub from 'pubsub-js';
+import { HashRouter as Router } from 'react-router-dom';
 
 export default class TripListEntryLogic {
   constructor() {
@@ -17,6 +18,8 @@ export default class TripListEntryLogic {
       data.obj = this.objs[id];
 
       PubSub.publish(`ui.triplistentry.${id}.update`, data);
+    } else if (action === 'open') {
+      (new Router()).history.push('/trip');
     }
   }
 }

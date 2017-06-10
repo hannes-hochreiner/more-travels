@@ -16,12 +16,16 @@ export default class TripListEntry extends Component {
     PubSub.publish(`ui.triplistentry.${this.state.id}.didMount`, this.state);
   }
 
+  componentWillUnmount() {
+    PubSub.unsubscribe(`ui.triplistentry.${this.state.id}`);
+  }
+
   update(topic, data) {
     this.setState({ obj: data.obj });
   }
 
   open() {
-    console.log('open');
+    PubSub.publish(`ui.triplistentry.${this.state.id}.open`, this.state);;
   }
 
   render() {
