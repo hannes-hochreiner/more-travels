@@ -30,16 +30,18 @@ export default class TripListEntry extends Component {
 
   render() {
     let l = '';
+    let t = '';
 
     if (this.state.obj) {
       l = this.state.obj.title;
+      t = `from ${this.state.obj.start} to ${this.state.obj.end}`;
     }
 
     return (
       <ListItem
         primaryText = {l}
-        secondaryText = "Jan 20, 2014"
-         onTouchTap={this.open.bind(this)}
+        secondaryText = {t}
+        onTouchTap={this.open.bind(this)}
       />
     );
   }

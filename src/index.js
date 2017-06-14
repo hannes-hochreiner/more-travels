@@ -8,20 +8,28 @@ import TripPage from './TripPage';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
+import Navigator from './Navigator';
 import LoggerConsole from './LoggerConsole';
 import TripListLogic from './TripListLogic';
 import TripListEntryLogic from './TripListEntryLogic';
+import TripPageLogic from './TripPageLogic';
+import StageListLogic from './StageListLogic';
+import StageListEntryLogic from './StageListEntryLogic';
 
+let nav = new Navigator();
 new LoggerConsole();
 new TripListLogic();
-new TripListEntryLogic();
+new TripListEntryLogic(nav);
+new TripPageLogic(nav);
+new StageListLogic();
+new StageListEntryLogic();
 
 injectTapEventPlugin();
 ReactDOM.render(
   <Router>
     <div>
       <Route exact path="/" component={App}/>
-      <Route path="/trip" component={TripPage}/>
+      <Route path="/trip/:tripid" component={TripPage}/>
     </div>
   </Router>, document.getElementById('root')
 );

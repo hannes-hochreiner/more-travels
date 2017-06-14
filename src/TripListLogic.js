@@ -6,7 +6,7 @@ export default class TripListLogic {
   }
 
   handle(topic, data) {
-    let [realm, type, id, action] = topic.split('.');
+    let [, , id, action] = topic.split('.');
 
     if (action === 'didMount') {
       PubSub.publish(`ui.triplist.${id}.update`, {
