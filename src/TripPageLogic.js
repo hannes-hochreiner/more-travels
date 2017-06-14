@@ -12,9 +12,7 @@ export default class TripPageLogic {
       'didMount': this.didMount,
       'close': this.close,
       'edit': this.edit,
-      'editDatesStart': this.editDatesStart,
-      'editDatesEnd': this.editDatesEnd,
-      'save': this.save
+      'save': this.save,
     };
 
     PubSub.subscribe('ui.trippage', this.handle.bind(this));
@@ -36,25 +34,9 @@ export default class TripPageLogic {
     PubSub.publish(`ui.trippage.${id}.update`, state);
   }
 
-  editDatesStart(realm, type, id, action, state) {
-    state.editDates = true;
-    state.dateStart = new Date(state.obj.start);
-    state.dateEnd = new Date(state.obj.end);
-
-    PubSub.publish(`ui.trippage.${id}.update`, state);
-  }
-
-  editDatesEnd(realm, type, id, action, state) {
-    state.obj.start = state.dateStart.toLocaleFormat('%Y-%m-%d');
-    state.obj.end = state.dateEnd.toLocaleFormat('%Y-%m-%d');
-    state.editDates = false;
-
-    PubSub.publish(`ui.trippage.${id}.update`, state);
-  }
-
   save(realm, type, id, action, state) {
     state.editMode = false;
-    
+
     PubSub.publish(`ui.trippage.${id}.update`, state);
   }
 

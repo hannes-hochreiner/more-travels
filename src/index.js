@@ -15,6 +15,8 @@ import TripListEntryLogic from './TripListEntryLogic';
 import TripPageLogic from './TripPageLogic';
 import StageListLogic from './StageListLogic';
 import StageListEntryLogic from './StageListEntryLogic';
+import TripViewLogic from './TripViewLogic';
+import TripEditLogic from './TripEditLogic';
 
 let nav = new Navigator();
 new LoggerConsole();
@@ -23,6 +25,8 @@ new TripListEntryLogic(nav);
 new TripPageLogic(nav);
 new StageListLogic();
 new StageListEntryLogic();
+new TripViewLogic(nav);
+new TripEditLogic(nav);
 
 injectTapEventPlugin();
 ReactDOM.render(
