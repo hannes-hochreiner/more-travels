@@ -16,7 +16,6 @@ export default class TripEditLogic {
       'editTitleStart': this.editTitleStart.bind(this),
       'editTitleEnd': this.editTitleEnd.bind(this),
       'save': this.save.bind(this),
-      'close': this.close.bind(this)
     }, 'ui.tripedit');
     this.publisher = new PubSubPublisher('ui.tripedit');
     this.handler.subscribe();
@@ -60,14 +59,7 @@ export default class TripEditLogic {
   }
 
   save(realm, type, id, action, data) {
-    if (data.props.onView) {
-      data.props.onView();
-    }
-  }
-
-  close(realm, type, id, action, data) {
-    if (data.props.onView) {
-      data.props.onClose();
-    }
+    console.log('saving');
+    this.publisher.publish(`${id}.view`, data);
   }
 }

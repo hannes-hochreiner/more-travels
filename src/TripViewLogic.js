@@ -1,4 +1,5 @@
-import PubSub from 'pubsub-js';
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 export default class TripViewLogic {
   constructor(nav) {
@@ -8,26 +9,18 @@ export default class TripViewLogic {
       2: { id: 2, title: 'test2', start: '2017-02-01', end: '2017-02-05' },
       3: { id: 3, title: 'test3', start: '2017-03-01', end: '2017-03-05' }
     };
-    this.handleFunctions = {
-      'init': this.init,
-    };
+    this.handler = new PubSubHandler({
+      'init': this.init.bind(this),
+    }, 'ui.tripview');
 
-    PubSub.subscribe('ui.tripview', this.handle.bind(this));
+    this.handler.subscribe();
+    this.publisher = new PubSubPublisher('ui.tripview');
   }
 
-  handle(topic, data) {
-    let [realm, type, id, action] = topic.split('.');
-    let fun = this.handleFunctions[action];
+  init(realm, type, id, action, data) {
+    data.state.obj = this.objs[id];
+    data.state.init = true;
 
-    if (fun) {
-      return fun.bind(this)(realm, type, id, action, data);
-    }
-  }
-
-  init(realm, type, id, action, state) {
-    state.obj = this.objs[id];
-    state.init = true;
-
-    PubSub.publish(`ui.tripview.${id}.update`, state);
+    this.publisher.publish(`${id}.update`, data.state);
   }
 }

@@ -71,8 +71,6 @@ export default class TripPage extends Component {
         <TripView
           key={`tripview${this.state.id}`}
           tripId={this.state.id}
-          onEdit={this.publisher.publish.bind(this.publisher, 'edit', {props: this.props, state: this.state})}
-          onClose={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
         />,
       <Divider key='divider'/>,
         <StageList

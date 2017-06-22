@@ -22,6 +22,18 @@ export default class TripPageLogic {
   init(realm, type, id, action, data) {
     data.state.obj = this.objs[id];
 
+    this.viewHandler = new PubSubHandler({
+      'edit': this.edit.bind(this),
+      'close': this.close.bind(this)
+    }, `ui.tripview.${id}`);
+    this.viewHandler.subscribe();
+
+    this.editHandler = new PubSubHandler({
+      'view': this.view.bind(this),
+      'close': this.view.bind(this)
+    }, `ui.tripedit.${id}`);
+    this.editHandler.subscribe();
+
     this.publisher.publish(`${id}.update`, data.state);
   }
 
@@ -30,12 +42,14 @@ export default class TripPageLogic {
   }
 
   edit(realm, type, id, action, data) {
+    data.state.obj = this.objs[id];
     data.state.editMode = true;
 
     this.publisher.publish(`${id}.update`, data.state);
   }
 
   view(realm, type, id, action, data) {
+    data.state.obj = this.objs[id];
     data.state.editMode = false;
 
     this.publisher.publish(`${id}.update`, data.state);

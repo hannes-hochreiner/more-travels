@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import AppBar from 'material-ui/AppBar';
 import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
@@ -16,23 +18,23 @@ export default class TripView extends Component {
     super(props);
     this.props = props;
     this.state = {};
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    }, `ui.tripview.${this.props.tripId}`);
+    this.publisher = new PubSubPublisher(`ui.tripview.${this.props.tripId}`);
   }
 
   componentDidMount() {
-    PubSub.subscribe(`ui.tripview.${this.props.tripId}`, this.handle.bind(this));
-    PubSub.publish(`ui.tripview.${this.props.tripId}.init`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.tripview.${this.props.tripId}`);
+    this.handler.unsubscribe();
   }
 
-  handle(topic, data) {
-    let [,,,action] = topic.split('.');
-
-    if (action === 'update') {
-      this.setState(data);
-    }
+  update(realm, type, id, action, data) {
+    this.setState(data);
   }
 
   render() {
@@ -50,11 +52,11 @@ export default class TripView extends Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
           >
-            <MenuItem primaryText="edit" onTouchTap={() => {this.props.onEdit && this.props.onEdit()}}/>
+            <MenuItem primaryText="edit" onTouchTap={this.publisher.publish.bind(this.publisher,'edit', {props: this.props, state: this.state})}/>
             <MenuItem primaryText="delete" />
           </IconMenu>
         }
-        onLeftIconButtonTouchTap={PubSub.publish.bind(null, `ui.tripview.${this.props.tripId}.close`, this.state)}
+        onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher,'close', {props: this.props, state: this.state})}
       />
       <List>
         <ListItem
