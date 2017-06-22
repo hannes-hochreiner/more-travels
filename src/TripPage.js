@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import LinearProgress from 'material-ui/LinearProgress';
 import Divider from 'material-ui/Divider';
@@ -16,31 +18,26 @@ export default class TripPage extends Component {
     this.props = props;
     this.state = {
       editMode: false,
-      datesEditDialog: false,
       id: props.match.params.tripid
     };
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    }, `ui.trippage.${props.match.params.tripid}`);
+    this.publisher = new PubSubPublisher(`ui.trippage.${props.match.params.tripid}`);
   }
 
   componentDidMount() {
-    PubSub.subscribe(
-      `ui.trippage.${this.state.id}`,
-      this.handle.bind(this)
-    );
-    PubSub.publish(
-      `ui.trippage.${this.state.id}.didMount`,
-      this.state
-    );
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.trippage.${this.state.id}`);
+    this.handler.unsubscribe();
   }
 
-  handle(topic, data) {
-    let [, , , action] = topic.split('.');
-
+  update(realm, type, id, action, state) {
     if (action === 'update') {
-      this.setState(data);
+      this.setState(state);
     }
   }
 
@@ -63,20 +60,26 @@ export default class TripPage extends Component {
     if (this.state.editMode) {
       content = [
         <TripEdit
+          key={`tripedit${this.state.id}`}
           tripId={this.state.id}
-          onView={PubSub.publish.bind(null,`ui.trippage.${this.state.id}.view`, this.state)}
-          onClose={PubSub.publish.bind(null,`ui.trippage.${this.state.id}.close`, this.state)}
+          onView={this.publisher.publish.bind(this.publisher, 'view', {props: this.props, state: this.state})}
+          onClose={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
         />,
       ];
     } else {
       content = [
         <TripView
+          key={`tripview${this.state.id}`}
           tripId={this.state.id}
-          onEdit={PubSub.publish.bind(null,`ui.trippage.${this.state.id}.edit`, this.state)}
-          onClose={PubSub.publish.bind(null,`ui.trippage.${this.state.id}.close`, this.state)}
+          onEdit={this.publisher.publish.bind(this.publisher, 'edit', {props: this.props, state: this.state})}
+          onClose={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
         />,
-        <Divider />,
-        <StageList id='1' tripId={this.state.id}/>
+      <Divider key='divider'/>,
+        <StageList
+          key={`stagelist1`}
+          id='1'
+          tripId={this.state.id}
+        />
       ];
     }
 

@@ -1,4 +1,5 @@
-import PubSub from 'pubsub-js';
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 export default class TripPageLogic {
   constructor(nav) {
@@ -8,44 +9,35 @@ export default class TripPageLogic {
       2: { id: 2, title: 'test2', start: '2017-02-01', end: '2017-02-05' },
       3: { id: 3, title: 'test3', start: '2017-03-01', end: '2017-03-05' }
     };
-    this.handleFunctions = {
-      'didMount': this.didMount,
-      'close': this.close,
-      'edit': this.edit,
-      'save': this.save,
-    };
-
-    PubSub.subscribe('ui.trippage', this.handle.bind(this));
+    this.handler = new PubSubHandler({
+      'init': this.init.bind(this),
+      'close': this.close.bind(this),
+      'edit': this.edit.bind(this),
+      'view': this.view.bind(this),
+    }, 'ui.trippage');
+    this.publisher = new PubSubPublisher('ui.trippage');
+    this.handler.subscribe();
   }
 
-  didMount(realm, type, id, action, state) {
-    state.obj = this.objs[id];
+  init(realm, type, id, action, data) {
+    data.state.obj = this.objs[id];
 
-    PubSub.publish(`ui.trippage.${id}.update`, state);
+    this.publisher.publish(`${id}.update`, data.state);
   }
 
-  close(realm, type, id, action, state) {
+  close(realm, type, id, action, data) {
     this.nav.goToTripList();
   }
 
-  edit(realm, type, id, action, state) {
-    state.editMode = true;
+  edit(realm, type, id, action, data) {
+    data.state.editMode = true;
 
-    PubSub.publish(`ui.trippage.${id}.update`, state);
+    this.publisher.publish(`${id}.update`, data.state);
   }
 
-  save(realm, type, id, action, state) {
-    state.editMode = false;
+  view(realm, type, id, action, data) {
+    data.state.editMode = false;
 
-    PubSub.publish(`ui.trippage.${id}.update`, state);
-  }
-
-  handle(topic, data) {
-    let [realm, type, id, action] = topic.split('.');
-    let fun = this.handleFunctions[action];
-
-    if (fun) {
-      return fun.bind(this)(realm, type, id, action, data);
-    }
+    this.publisher.publish(`${id}.update`, data.state);
   }
 }

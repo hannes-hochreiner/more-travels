@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
@@ -17,20 +19,22 @@ export default class TripEdit extends Component {
     super(props);
     this.props = props;
     this.state = {};
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    }, `ui.tripedit.${this.props.tripId}`);
+    this.publisher = new PubSubPublisher(`ui.tripedit.${this.props.tripId}`);
   }
 
   componentDidMount() {
-    PubSub.subscribe(`ui.tripedit.${this.props.tripId}`, this.handle.bind(this));
-    PubSub.publish(`ui.tripedit.${this.props.tripId}.init`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.tripedit.${this.props.tripId}`);
+    this.handler.unsubscribe();
   }
 
-  handle(topic, data) {
-    let [,,,action] = topic.split('.');
-
+  update(realm, type, id, action, data) {
     if (action === 'update') {
       this.setState(data);
     }
@@ -45,19 +49,19 @@ export default class TripEdit extends Component {
   }
 
   editTitleStart() {
-    PubSub.publish(`ui.tripedit.${this.props.tripId}.editTitleStart`, this.state);
+    this.publisher.publish('editTitleStart', {props: this.props, state: this.state});
   }
 
   editTitleEnd() {
-    PubSub.publish(`ui.tripedit.${this.props.tripId}.editTitleEnd`, this.state);
+    this.publisher.publish('editTitleEnd', {props: this.props, state: this.state});
   }
 
   editDatesStart() {
-    PubSub.publish(`ui.tripedit.${this.props.tripId}.editDatesStart`, this.state);
+    this.publisher.publish('editDatesStart', {props: this.props, state: this.state});
   }
 
   editDatesEnd() {
-    PubSub.publish(`ui.tripedit.${this.props.tripId}.editDatesEnd`, this.state);
+    this.publisher.publish('editDatesEnd', {props: this.props, state: this.state});
   }
 
   render() {
@@ -69,8 +73,8 @@ export default class TripEdit extends Component {
       <div>
         <AppBar
           iconElementLeft={<IconButton><NavigationClose/></IconButton>}
-          iconElementRight={<FlatButton label='save' onTouchTap={PubSub.publish.bind(null, `ui.trippage.${this.state.id}.save`, this.state)}/>}
-          onLeftIconButtonTouchTap={PubSub.publish.bind(null, `ui.trippage.${this.props.tripId}.close`, this.state)}
+          iconElementRight={<FlatButton label='save' onTouchTap={this.publisher.publish.bind(this.publisher, 'save', {props: this.props, state: this.state})}/>}
+          onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
         />
         <List>
           <ListItem
