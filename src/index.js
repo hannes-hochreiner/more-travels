@@ -9,6 +9,7 @@ import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
 import Navigator from './Navigator';
+import Repository from './Repository';
 import LoggerConsole from './LoggerConsole';
 import TripListLogic from './TripListLogic';
 import TripListEntryLogic from './TripListEntryLogic';
@@ -19,14 +20,15 @@ import TripViewLogic from './TripViewLogic';
 import TripEditLogic from './TripEditLogic';
 
 let nav = new Navigator();
+let repo = new Repository();
 new LoggerConsole();
 new TripListLogic();
 new TripListEntryLogic(nav);
-new TripPageLogic(nav);
+new TripPageLogic(nav, repo);
 new StageListLogic();
 new StageListEntryLogic();
-new TripViewLogic(nav);
-new TripEditLogic(nav);
+new TripViewLogic(nav, repo);
+new TripEditLogic(nav, repo);
 
 injectTapEventPlugin();
 ReactDOM.render(
