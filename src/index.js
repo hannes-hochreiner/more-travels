@@ -22,11 +22,11 @@ import TripEditLogic from './TripEditLogic';
 let nav = new Navigator();
 let repo = new Repository();
 new LoggerConsole();
-new TripListLogic();
-new TripListEntryLogic(nav);
+new TripListLogic(repo);
+new TripListEntryLogic(nav, repo);
 new TripPageLogic(nav, repo);
-new StageListLogic();
-new StageListEntryLogic();
+new StageListLogic(repo);
+new StageListEntryLogic(nav, repo);
 new TripViewLogic(nav, repo);
 new TripEditLogic(nav, repo);
 

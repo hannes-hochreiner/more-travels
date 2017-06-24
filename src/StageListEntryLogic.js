@@ -1,27 +1,19 @@
-import PubSub from 'pubsub-js';
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 export default class StageListEntryLogic {
-  constructor(nav) {
+  constructor(nav, repo) {
     this.nav = nav;
-    this.objs = {
-      'p1': { id: 'p1', type: 'place', title: 'place1'},
-      'p2': { id: 'p2', type: 'place', title: 'place2'},
-      't1': { id: 't1', type: 'travel', title: 'travel2-3'},
-      'p3': { id: 'p3', type: 'place', title: 'place3'},
-      't2': { id: 't2', type: 'travel', title: 'travel3-4'},
-      'p4': { id: 'p4', type: 'place', title: 'place4'},
-    };
-
-    PubSub.subscribe('ui.stagelistentry', this.handle.bind(this));
+    this.repo = repo;
+    this.handler = new PubSubHandler({
+      'init': this.init.bind(this),
+    }, 'ui.stagelistentry');
+    this.handler.subscribe();
+    this.publisher = new PubSubPublisher('ui.stagelistentry');
   }
 
-  handle(topic, data) {
-    let [, , id, action] = topic.split('.');
-
-    if (action === 'didMount') {
-      data.obj = this.objs[id];
-
-      PubSub.publish(`ui.stagelistentry.${id}.update`, data);
-    }
+  init(realm, type, id, action, data) {
+    data.state.obj = this.repo.getStageById(id);
+    this.publisher.publish(`${id}.update`, data);
   }
 }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import {ListItem} from 'material-ui/List';
 import MapsPlace from 'material-ui/svg-icons/maps/place';
@@ -12,23 +14,27 @@ export default class TripListEntry extends Component {
     this.state = {
       id: props.id
     };
-    PubSub.subscribe(`ui.stagelistentry.${this.state.id}.update`, this.update.bind(this));
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    }, `ui.stagelistentry.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.stagelistentry.${this.state.id}`);
   }
 
   componentDidMount() {
-    PubSub.publish(`ui.stagelistentry.${this.state.id}.didMount`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.stagelistentry.${this.state.id}`);
+    this.handler.unsubscribe();
   }
 
-  update(topic, data) {
-    this.setState({ obj: data.obj });
+  update(realm, type, id, action, data) {
+    this.setState(data);
   }
 
   open() {
-    PubSub.publish(`ui.stagelistentry.${this.state.id}.open`, this.state);;
+    this.publisher.publish('open', {props: this.props, state: this.state});
   }
 
   render() {

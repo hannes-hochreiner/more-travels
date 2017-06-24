@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import List from 'material-ui/List';
 import StageListEntry from './StageListEntry';
@@ -7,23 +9,25 @@ import StageListEntry from './StageListEntry';
 export default class StageList extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      id: props.id,
-      tripId: props.tripId
-    };
-    PubSub.subscribe(`ui.stagelist.${this.state.id}.update`, this.update.bind(this));
+    this.props = props;
+    this.state = {};
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    }, `ui.stagelist.${this.props.id}`);
+    this.publisher = new PubSubPublisher(`ui.stagelist.${this.props.id}`);
   }
 
   componentDidMount() {
-    PubSub.publish(`ui.stagelist.${this.state.id}.didMount`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.stagelist.${this.state.id}`);
+    this.handler.unsubscribe();
   }
 
-  update(topic, data) {
-    this.setState({ stages: data.stages });
+  update(realm, type, id, action, data) {
+    this.setState(data);
   }
 
   render() {

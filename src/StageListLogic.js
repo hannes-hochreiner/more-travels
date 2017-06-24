@@ -1,29 +1,21 @@
-import PubSub from 'pubsub-js';
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 export default class StageListLogic {
-  constructor() {
-    this.stages = {
-      2: [
-        { id: 'p1'},
-        { id: 'p2'},
-        { id: 't1'},
-        { id: 'p3'},
-        { id: 't2'},
-        { id: 'p4'},
-      ]
-    };
+  constructor(repo) {
+    this.repo = repo;
+    this.handler = new PubSubHandler({
+      'init': this.init.bind(this)
+    }, 'ui.stagelist');
+    this.publisher = new PubSubPublisher('ui.stagelist');
 
-    PubSub.subscribe('ui.stagelist', this.handle.bind(this));
+    this.handler.subscribe();
   }
 
-  handle(topic, data) {
-    let [, , id, action] = topic.split('.');
-    let stages = this.stages[data.tripId] || [];
-
-    if (action === 'didMount') {
-      PubSub.publish(`ui.stagelist.${id}.update`, {
-        stages: stages
-      });
-    }
+  init(realm, type, id, action, data) {
+    data.state.id = data.props.id;
+    data.state.tripId = data.props.tripId;
+    data.state.stages = this.repo.getStagesByTripId(data.state.tripId);
+    this.publisher.publish(`${id}.update`, data.state);
   }
 }

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import { List, FloatingActionButton } from 'material-ui';
 import ContentAdd from 'material-ui/svg-icons/content/add';
@@ -12,19 +14,23 @@ export default class TripList extends Component {
     this.state = {
       id: props.id
     };
-    PubSub.subscribe(`ui.triplist.${this.state.id}.update`, this.update.bind(this));
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    },`ui.triplist.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.triplist.${this.state.id}`);
   }
 
   componentDidMount() {
-    PubSub.publish(`ui.triplist.${this.state.id}.didMount`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.triplist.${this.state.id}`);
+    this.handler.unsubscribe();
   }
 
-  update(topic, data) {
-    this.setState({ trips: data.trips });
+  update(realm, type, id, action, data) {
+    this.setState(data);
   }
 
   addTrip() {

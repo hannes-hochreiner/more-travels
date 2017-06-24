@@ -1,21 +1,21 @@
-import PubSub from 'pubsub-js';
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 export default class TripListLogic {
-  constructor() {
-    PubSub.subscribe('ui.triplist', this.handle.bind(this));
+  constructor(repo) {
+    this.repo = repo;
+    this.handler = new PubSubHandler({
+      'init': this.init.bind(this)
+    }, 'ui.triplist');
+    this.handler.subscribe();
+    this.publisher = new PubSubPublisher('ui.triplist');
   }
 
-  handle(topic, data) {
-    let [, , id, action] = topic.split('.');
+  init(realm, type, id, action, data) {
+    let state = data.state;
 
-    if (action === 'didMount') {
-      PubSub.publish(`ui.triplist.${id}.update`, {
-        trips: [
-          { id: 1 },
-          { id: 2 },
-          { id: 3 }
-        ]
-      });
-    }
+    state.trips = this.repo.getAllTrips();
+
+    this.publisher.publish(`${id}.update`, state);
   }
 }

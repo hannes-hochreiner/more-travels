@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
-import PubSub from 'pubsub-js';
+
+import PubSubHandler from './PubSubHandler';
+import PubSubPublisher from './PubSubPublisher';
 
 import {ListItem} from 'material-ui/List';
 
@@ -9,23 +11,27 @@ export default class TripListEntry extends Component {
     this.state = {
       id: props.id
     };
-    PubSub.subscribe(`ui.triplistentry.${this.state.id}.update`, this.update.bind(this));
+    this.handler = new PubSubHandler({
+      'update': this.update.bind(this)
+    },`ui.triplistentry.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.triplistentry.${this.state.id}`);
   }
 
   componentDidMount() {
-    PubSub.publish(`ui.triplistentry.${this.state.id}.didMount`, this.state);
+    this.handler.subscribe();
+    this.publisher.publish('init', {props: this.props, state: this.state});
   }
 
   componentWillUnmount() {
-    PubSub.unsubscribe(`ui.triplistentry.${this.state.id}`);
+    this.handler.unsubscribe();
   }
 
-  update(topic, data) {
-    this.setState({ obj: data.obj });
+  update(realm, type, id, action, data) {
+    this.setState(data);
   }
 
   open() {
-    PubSub.publish(`ui.triplistentry.${this.state.id}.open`, this.state);;
+    this.publisher.publish('open', {props: this.props, state: this.state});
   }
 
   render() {
