@@ -4,6 +4,7 @@ import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 
 import { List, FloatingActionButton } from 'material-ui';
+import LinearProgress from 'material-ui/LinearProgress';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import TripListEntry from './TripListEntry';
@@ -38,6 +39,12 @@ export default class TripList extends Component {
   }
 
   render() {
+    if (!this.state.init) {
+      return (
+        <LinearProgress mode="indeterminate" />
+      );
+    }
+
     let l = '';
 
     if (this.state && this.state.trips) {

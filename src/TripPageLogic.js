@@ -16,36 +16,38 @@ export default class TripPageLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.editMode = false;
-    data.obj = this.repo.getTripById(id);
+    this.repo.getTripById(id).then(trip => {
+      data.editMode = false;
+      data.obj = trip;
 
-    if (!data.obj) {
-      let d = new Date();
+      if (!data.obj) {
+        let d = new Date();
 
-      data.editMode = true;
-      data.obj = {
-        id: id,
-        type: 'trip',
-        title: 'new trip',
-        start: '2017-01-01',
-        end: '2017-01-05'
-      };
-    }
+        data.editMode = true;
+        data.obj = {
+          id: id,
+          type: 'trip',
+          title: 'new trip',
+          start: '2017-01-01',
+          end: '2017-01-05'
+        };
+      }
 
-    this.viewHandler = new PubSubHandler({
-      'edit': this.edit.bind(this),
-      'close': this.close.bind(this)
-    }, `ui.tripview.${id}`);
-    this.viewHandler.subscribe();
+      this.viewHandler = new PubSubHandler({
+        'edit': this.edit.bind(this),
+        'close': this.close.bind(this)
+      }, `ui.tripview.${id}`);
+      this.viewHandler.subscribe();
 
-    this.editHandler = new PubSubHandler({
-      'view': this.view.bind(this),
-      'close': this.close.bind(this)
-    }, `ui.tripedit.${id}`);
-    this.editHandler.subscribe();
+      this.editHandler = new PubSubHandler({
+        'view': this.view.bind(this),
+        'close': this.close.bind(this)
+      }, `ui.tripedit.${id}`);
+      this.editHandler.subscribe();
 
-    data.init = true;
-    this.publisher.publish(`${id}.update`, data);
+      data.init = true;
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 
   close(realm, type, id, action, data) {
@@ -53,16 +55,20 @@ export default class TripPageLogic {
   }
 
   edit(realm, type, id, action, data) {
-    data.obj = this.repo.getTripById(id);
-    data.editMode = true;
+    this.repo.getTripById(id).then(trip => {
+      data.obj = trip;
+      data.editMode = true;
 
-    this.publisher.publish(`${id}.update`, data);
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 
   view(realm, type, id, action, data) {
-    data.obj = this.repo.getTripById(id);
-    data.editMode = false;
+    this.repo.getTripById(id).then(trip => {
+      data.obj = trip;
+      data.editMode = false;
 
-    this.publisher.publish(`${id}.update`, data);
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 }

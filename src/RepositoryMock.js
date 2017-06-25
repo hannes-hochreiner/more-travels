@@ -1,4 +1,4 @@
-export default class Repository {
+export default class RepositoryMock {
   constructor() {
     this.objs = [
       { _id: '1', type: 'trip', title: 'test1', start: '2017-01-01', end: '2017-01-05' },
@@ -14,7 +14,9 @@ export default class Repository {
   }
 
   getAllTrips() {
-    return this.objs.filter(obj => obj.type === 'trip');
+    return new Promise((resolve, reject) => {
+      resolve(this.objs.filter(obj => obj.type === 'trip'));
+    });
   }
 
   getTripById(id) {
@@ -22,7 +24,9 @@ export default class Repository {
   }
 
   getStagesByTripId(tripId) {
-    return this.objs.filter(obj => obj.parent === tripId && (obj.type === 'place' || obj.type === 'travel'));
+    return new Promise((resolve, reject) => {
+      resolve(this.objs.filter(obj => obj.parent === tripId && (obj.type === 'place' || obj.type === 'travel')));
+    });
   }
 
   getStageById(id) {
@@ -30,11 +34,16 @@ export default class Repository {
   }
 
   updateObject(obj) {
-    this.objs = this.objs.filter(o => o._id !== obj._id);
-    this.objs.push(obj);
+    return new Promise((resolve, reject) => {
+      this.objs = this.objs.filter(o => o._id !== obj._id);
+      this.objs.push(obj);
+      resolve();
+    });
   }
 
   _getObjById(id) {
-    return this.objs.filter(obj => obj._id === id)[0];
+    return new Promise((resolve, reject) => {
+      resolve(this.objs.filter(obj => obj._id === id)[0]);
+    });
   }
 }

@@ -5,6 +5,7 @@ import PubSubPublisher from './PubSubPublisher';
 
 import List from 'material-ui/List';
 import StageListEntry from './StageListEntry';
+import LinearProgress from 'material-ui/LinearProgress';
 
 export default class StageList extends Component {
   constructor(props) {
@@ -33,6 +34,10 @@ export default class StageList extends Component {
   }
 
   render() {
+    if (!this.state.init) {
+      return <LinearProgress mode="indeterminate" />;
+    }
+
     let l = '';
 
     if (this.state && this.state.stages) {

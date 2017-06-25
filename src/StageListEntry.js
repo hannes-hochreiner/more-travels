@@ -38,7 +38,7 @@ export default class TripListEntry extends Component {
   }
 
   render() {
-    if (!this.state.obj) {
+    if (!this.state.init) {
       return <LinearProgress mode="indeterminate" />;
     }
 

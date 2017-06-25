@@ -4,6 +4,7 @@ import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 
 import {ListItem} from 'material-ui/List';
+import LinearProgress from 'material-ui/LinearProgress';
 
 export default class TripListEntry extends Component {
   constructor(props) {
@@ -35,6 +36,12 @@ export default class TripListEntry extends Component {
   }
 
   render() {
+    if (!this.state.init) {
+      return (
+        <LinearProgress mode="indeterminate" />
+      );
+    }
+
     let l = '';
     let t = '';
 

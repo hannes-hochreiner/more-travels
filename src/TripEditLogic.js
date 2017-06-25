@@ -18,12 +18,17 @@ export default class TripEditLogic {
   }
 
   init(realm, type, id, action, data) {
-    if (!data.obj) {
-      data.obj = this.repo.getTripById(id);
+    if (data.obj) {
+      data.init = true;
+      this.publisher.publish(`${id}.update`, data);
+      return;
     }
-    data.init = true;
 
-    this.publisher.publish(`${id}.update`, data);
+    this.repo.getTripById(id).then(trip => {
+      data.obj = trip;
+      data.init = true;
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 
   editDatesStart(realm, type, id, action, data) {
@@ -57,7 +62,8 @@ export default class TripEditLogic {
   }
 
   save(realm, type, id, action, data) {
-    this.repo.updateObject(data.obj);
-    this.publisher.publish(`${id}.view`, data);
+    this.repo.updateObject(data.obj).then(() => {
+      this.publisher.publish(`${id}.view`, data);
+    });
   }
 }

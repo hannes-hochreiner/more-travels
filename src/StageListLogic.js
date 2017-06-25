@@ -13,7 +13,10 @@ export default class StageListLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.stages = this.repo.getStagesByTripId(data.tripId);
-    this.publisher.publish(`${id}.update`, data);
+    this.repo.getStagesByTripId(data.tripId).then(stages => {
+      data.init = true;
+      data.stages = stages;
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 }

@@ -15,9 +15,11 @@ export default class TripListLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.trips = this.repo.getAllTrips();
-
-    this.publisher.publish(`${id}.update`, data);
+    this.repo.getAllTrips().then(trips => {
+      data.init = true;
+      data.trips = trips;
+      this.publisher.publish(`${id}.update`, data);
+    });
   }
 
   add(realm, type, id, action, data) {
