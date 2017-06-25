@@ -15,20 +15,19 @@ import TripEdit from './TripEdit';
 export default class TripPage extends Component {
   constructor(props) {
     super(props);
-    this.props = props;
+
     this.state = {
-      editMode: false,
       id: props.match.params.tripid
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.trippage.${props.match.params.tripid}`);
-    this.publisher = new PubSubPublisher(`ui.trippage.${props.match.params.tripid}`);
+    }, `ui.trippage.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.trippage.${this.state.id}`);
   }
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {
@@ -42,7 +41,7 @@ export default class TripPage extends Component {
   }
 
   render() {
-    if (!this.state.obj) {
+    if (!this.state.init) {
       return (
         <MoreTravelsMuiThemeProvider>
           <div className="TripPage">
@@ -62,8 +61,7 @@ export default class TripPage extends Component {
         <TripEdit
           key={`tripedit${this.state.id}`}
           tripId={this.state.id}
-          onView={this.publisher.publish.bind(this.publisher, 'view', {props: this.props, state: this.state})}
-          onClose={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
+          trip={this.state.obj}
         />,
       ];
     } else {

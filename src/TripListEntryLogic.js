@@ -14,8 +14,8 @@ export default class TripListEntryLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
-    this.publisher.publish(`${id}.update`, data.state);
+    data.obj = this.repo.getTripById(id);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   open(realm, type, id, action, data) {

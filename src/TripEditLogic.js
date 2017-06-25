@@ -18,44 +18,46 @@ export default class TripEditLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
-    data.state.init = true;
+    if (!data.obj) {
+      data.obj = this.repo.getTripById(id);
+    }
+    data.init = true;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   editDatesStart(realm, type, id, action, data) {
-    data.state.editDates = true;
-    data.state.dateStart = new Date(data.state.obj.start);
-    data.state.dateEnd = new Date(data.state.obj.end);
+    data.editDates = true;
+    data.dateStart = new Date(data.obj.start);
+    data.dateEnd = new Date(data.obj.end);
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   editDatesEnd(realm, type, id, action, data) {
-    data.state.obj.start = data.state.dateStart.toLocaleFormat('%Y-%m-%d');
-    data.state.obj.end = data.state.dateEnd.toLocaleFormat('%Y-%m-%d');
-    data.state.editDates = false;
+    data.obj.start = data.dateStart.toLocaleFormat('%Y-%m-%d');
+    data.obj.end = data.dateEnd.toLocaleFormat('%Y-%m-%d');
+    data.editDates = false;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   editTitleStart(realm, type, id, action, data) {
-    data.state.editTitle = true;
-    data.state.title = data.state.obj.title;
+    data.editTitle = true;
+    data.title = data.obj.title;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   editTitleEnd(realm, type, id, action, data) {
-    data.state.obj.title = data.state.title;
-    data.state.editTitle = false;
+    data.obj.title = data.title;
+    data.editTitle = false;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   save(realm, type, id, action, data) {
-    console.log('saving');
+    this.repo.updateObject(data.obj);
     this.publisher.publish(`${id}.view`, data);
   }
 }

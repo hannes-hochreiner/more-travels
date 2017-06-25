@@ -22,7 +22,7 @@ import TripEditLogic from './TripEditLogic';
 let nav = new Navigator();
 let repo = new Repository();
 new LoggerConsole();
-new TripListLogic(repo);
+new TripListLogic(nav, repo);
 new TripListEntryLogic(nav, repo);
 new TripPageLogic(nav, repo);
 new StageListLogic(repo);

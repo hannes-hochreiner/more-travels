@@ -13,7 +13,7 @@ export default class StageListEntryLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.state.obj = this.repo.getStageById(id);
+    data.obj = this.repo.getStageById(id);
     this.publisher.publish(`${id}.update`, data);
   }
 }

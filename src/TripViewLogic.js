@@ -14,9 +14,9 @@ export default class TripViewLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
-    data.state.init = true;
+    data.obj = this.repo.getTripById(id);
+    data.init = true;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 }

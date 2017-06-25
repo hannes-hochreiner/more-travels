@@ -19,7 +19,7 @@ export default class TripListEntry extends Component {
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {

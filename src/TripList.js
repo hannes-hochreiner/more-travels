@@ -34,7 +34,7 @@ export default class TripList extends Component {
   }
 
   addTrip() {
-    console.log('adding trip');
+    this.publisher.publish('add', {props: this.props, state: this.state});
   }
 
   render() {

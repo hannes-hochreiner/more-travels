@@ -16,7 +16,21 @@ export default class TripPageLogic {
   }
 
   init(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
+    data.editMode = false;
+    data.obj = this.repo.getTripById(id);
+
+    if (!data.obj) {
+      let d = new Date();
+
+      data.editMode = true;
+      data.obj = {
+        id: id,
+        type: 'trip',
+        title: 'new trip',
+        start: '2017-01-01',
+        end: '2017-01-05'
+      };
+    }
 
     this.viewHandler = new PubSubHandler({
       'edit': this.edit.bind(this),
@@ -26,11 +40,12 @@ export default class TripPageLogic {
 
     this.editHandler = new PubSubHandler({
       'view': this.view.bind(this),
-      'close': this.view.bind(this)
+      'close': this.close.bind(this)
     }, `ui.tripedit.${id}`);
     this.editHandler.subscribe();
 
-    this.publisher.publish(`${id}.update`, data.state);
+    data.init = true;
+    this.publisher.publish(`${id}.update`, data);
   }
 
   close(realm, type, id, action, data) {
@@ -38,16 +53,16 @@ export default class TripPageLogic {
   }
 
   edit(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
-    data.state.editMode = true;
+    data.obj = this.repo.getTripById(id);
+    data.editMode = true;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   view(realm, type, id, action, data) {
-    data.state.obj = this.repo.getTripById(id);
-    data.state.editMode = false;
+    data.obj = this.repo.getTripById(id);
+    data.editMode = false;
 
-    this.publisher.publish(`${id}.update`, data.state);
+    this.publisher.publish(`${id}.update`, data);
   }
 }

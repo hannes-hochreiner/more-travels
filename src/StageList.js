@@ -9,17 +9,19 @@ import StageListEntry from './StageListEntry';
 export default class StageList extends Component {
   constructor(props) {
     super(props);
-    this.props = props;
-    this.state = {};
+    this.state = {
+      id: props.id,
+      tripId: props.tripId
+    };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.stagelist.${this.props.id}`);
-    this.publisher = new PubSubPublisher(`ui.stagelist.${this.props.id}`);
+    }, `ui.stagelist.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.stagelist.${this.state.id}`);
   }
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {

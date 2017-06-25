@@ -17,17 +17,19 @@ import TextField from 'material-ui/TextField';
 export default class TripEdit extends Component {
   constructor(props) {
     super(props);
-    this.props = props;
-    this.state = {};
+    this.state = {
+      id: this.props.tripId,
+      obj: this.props.trip
+    };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.tripedit.${this.props.tripId}`);
-    this.publisher = new PubSubPublisher(`ui.tripedit.${this.props.tripId}`);
+    }, `ui.tripedit.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.tripedit.${this.state.id}`);
   }
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {
@@ -49,19 +51,19 @@ export default class TripEdit extends Component {
   }
 
   editTitleStart() {
-    this.publisher.publish('editTitleStart', {props: this.props, state: this.state});
+    this.publisher.publish('editTitleStart', this.state);
   }
 
   editTitleEnd() {
-    this.publisher.publish('editTitleEnd', {props: this.props, state: this.state});
+    this.publisher.publish('editTitleEnd', this.state);
   }
 
   editDatesStart() {
-    this.publisher.publish('editDatesStart', {props: this.props, state: this.state});
+    this.publisher.publish('editDatesStart', this.state);
   }
 
   editDatesEnd() {
-    this.publisher.publish('editDatesEnd', {props: this.props, state: this.state});
+    this.publisher.publish('editDatesEnd', this.state);
   }
 
   render() {
@@ -73,8 +75,8 @@ export default class TripEdit extends Component {
       <div>
         <AppBar
           iconElementLeft={<IconButton><NavigationClose/></IconButton>}
-          iconElementRight={<FlatButton label='save' onTouchTap={this.publisher.publish.bind(this.publisher, 'save', {props: this.props, state: this.state})}/>}
-          onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher, 'close', {props: this.props, state: this.state})}
+          iconElementRight={<FlatButton label='save' onTouchTap={this.publisher.publish.bind(this.publisher, 'save', this.state)}/>}
+          onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher, 'close', this.state)}
         />
         <List>
           <ListItem

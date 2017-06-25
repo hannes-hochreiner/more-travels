@@ -22,7 +22,7 @@ export default class TripListEntry extends Component {
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {
@@ -34,7 +34,7 @@ export default class TripListEntry extends Component {
   }
 
   open() {
-    this.publisher.publish('open', {props: this.props, state: this.state});
+    this.publisher.publish('open', this.state);
   }
 
   render() {

@@ -16,17 +16,18 @@ import LinearProgress from 'material-ui/LinearProgress';
 export default class TripView extends Component {
   constructor(props) {
     super(props);
-    this.props = props;
-    this.state = {};
+    this.state = {
+      id: props.tripId
+    };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.tripview.${this.props.tripId}`);
-    this.publisher = new PubSubPublisher(`ui.tripview.${this.props.tripId}`);
+    }, `ui.tripview.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.tripview.${this.state.id}`);
   }
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {
@@ -52,11 +53,11 @@ export default class TripView extends Component {
             targetOrigin={{horizontal: 'right', vertical: 'top'}}
             anchorOrigin={{horizontal: 'right', vertical: 'top'}}
           >
-            <MenuItem primaryText="edit" onTouchTap={this.publisher.publish.bind(this.publisher,'edit', {props: this.props, state: this.state})}/>
+            <MenuItem primaryText="edit" onTouchTap={this.publisher.publish.bind(this.publisher,'edit', this.state)}/>
             <MenuItem primaryText="delete" />
           </IconMenu>
         }
-        onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher,'close', {props: this.props, state: this.state})}
+        onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher,'close', this.state)}
       />
       <List>
         <ListItem

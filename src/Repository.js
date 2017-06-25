@@ -29,6 +29,11 @@ export default class Repository {
     return this._getObjById(id);
   }
 
+  updateObject(obj) {
+    this.objs = this.objs.filter(o => o.id !== obj.id);
+    this.objs.push(obj);
+  }
+
   _getObjById(id) {
     return this.objs.filter(obj => obj.id === id)[0];
   }
