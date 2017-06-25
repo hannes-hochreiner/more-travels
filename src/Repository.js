@@ -1,15 +1,15 @@
 export default class Repository {
   constructor() {
     this.objs = [
-      { id: '1', type: 'trip', title: 'test1', start: '2017-01-01', end: '2017-01-05' },
-      { id: '2', type: 'trip', title: 'test2', start: '2017-02-01', end: '2017-02-05' },
-      { id: '3', type: 'trip', title: 'test3', start: '2017-03-01', end: '2017-03-05' },
-      { id: 'p1', parent: '2', type: 'place', title: 'place1'},
-      { id: 'p2', parent: '2', type: 'place', title: 'place2'},
-      { id: 'p3', parent: '2', type: 'place', title: 'place3'},
-      { id: 'p4', parent: '2', type: 'place', title: 'place4'},
-      { id: 't1', parent: '2', type: 'travel', title: 'travel2-3'},
-      { id: 't2', parent: '2', type: 'travel', title: 'travel3-4'},
+      { _id: '1', type: 'trip', title: 'test1', start: '2017-01-01', end: '2017-01-05' },
+      { _id: '2', type: 'trip', title: 'test2', start: '2017-02-01', end: '2017-02-05' },
+      { _id: '3', type: 'trip', title: 'test3', start: '2017-03-01', end: '2017-03-05' },
+      { _id: 'p1', parent: '2', type: 'place', title: 'place1'},
+      { _id: 'p2', parent: '2', type: 'place', title: 'place2'},
+      { _id: 'p3', parent: '2', type: 'place', title: 'place3'},
+      { _id: 'p4', parent: '2', type: 'place', title: 'place4'},
+      { _id: 't1', parent: '2', type: 'travel', title: 'travel2-3'},
+      { _id: 't2', parent: '2', type: 'travel', title: 'travel3-4'},
     ];
   }
 
@@ -30,11 +30,11 @@ export default class Repository {
   }
 
   updateObject(obj) {
-    this.objs = this.objs.filter(o => o.id !== obj.id);
+    this.objs = this.objs.filter(o => o._id !== obj._id);
     this.objs.push(obj);
   }
 
   _getObjById(id) {
-    return this.objs.filter(obj => obj.id === id)[0];
+    return this.objs.filter(obj => obj._id === id)[0];
   }
 }

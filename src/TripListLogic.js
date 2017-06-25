@@ -15,11 +15,9 @@ export default class TripListLogic {
   }
 
   init(realm, type, id, action, data) {
-    let state = data.state;
+    data.trips = this.repo.getAllTrips();
 
-    state.trips = this.repo.getAllTrips();
-
-    this.publisher.publish(`${id}.update`, state);
+    this.publisher.publish(`${id}.update`, data);
   }
 
   add(realm, type, id, action, data) {

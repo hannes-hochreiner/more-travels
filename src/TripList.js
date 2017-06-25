@@ -22,7 +22,7 @@ export default class TripList extends Component {
 
   componentDidMount() {
     this.handler.subscribe();
-    this.publisher.publish('init', {props: this.props, state: this.state});
+    this.publisher.publish('init', this.state);
   }
 
   componentWillUnmount() {
@@ -34,7 +34,7 @@ export default class TripList extends Component {
   }
 
   addTrip() {
-    this.publisher.publish('add', {props: this.props, state: this.state});
+    this.publisher.publish('add', this.state);
   }
 
   render() {
@@ -42,7 +42,7 @@ export default class TripList extends Component {
 
     if (this.state && this.state.trips) {
       l = this.state.trips.map(entry => {
-        return <TripListEntry key={entry.id} id={entry.id}/>
+        return <TripListEntry key={entry._id} id={entry._id}/>
       });
     }
 
