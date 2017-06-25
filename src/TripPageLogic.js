@@ -16,7 +16,9 @@ export default class TripPageLogic {
   }
 
   init(realm, type, id, action, data) {
-    this.repo.getTripById(id).then(trip => {
+    this.repo.getTripById(id).catch(err => {
+      return null;
+    }).then(trip => {
       data.editMode = false;
       data.obj = trip;
 
@@ -25,7 +27,7 @@ export default class TripPageLogic {
 
         data.editMode = true;
         data.obj = {
-          id: id,
+          _id: id,
           type: 'trip',
           title: 'new trip',
           start: '2017-01-01',

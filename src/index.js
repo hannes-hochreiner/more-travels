@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { HashRouter as Router, Route } from 'react-router-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
+import PouchDb from 'pouchdb';
 
 import App from './App';
 import TripPage from './TripPage';
@@ -18,9 +19,10 @@ import StageListLogic from './StageListLogic';
 import StageListEntryLogic from './StageListEntryLogic';
 import TripViewLogic from './TripViewLogic';
 import TripEditLogic from './TripEditLogic';
+import RepositoryPouchDb from './RepositoryPouchDb';
 
 let nav = new Navigator();
-let repo = new RepositoryMock();
+let repo = new RepositoryPouchDb(PouchDb);
 new LoggerConsole();
 new TripListLogic(nav, repo);
 new TripListEntryLogic(nav, repo);
@@ -35,7 +37,7 @@ ReactDOM.render(
   <Router>
     <div>
       <Route exact path="/" component={App}/>
-      <Route path="/trip/:tripid" component={TripPage}/>
+      <Route path="/trips/:tripid" component={TripPage}/>
     </div>
   </Router>, document.getElementById('root')
 );

@@ -17,7 +17,7 @@ export default class TripPage extends Component {
     super(props);
 
     this.state = {
-      id: props.match.params.tripid
+      id: `trips/${props.match.params.tripid}`
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)

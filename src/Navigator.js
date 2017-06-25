@@ -2,7 +2,7 @@ import { HashRouter as Router } from 'react-router-dom';
 
 export default class Navigator {
   goToTrip(id) {
-    (new Router()).history.push(`/trip/${id}`);
+    (new Router()).history.push(`${id}`);
   }
 
   goToTripList() {
