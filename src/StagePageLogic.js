@@ -1,8 +1,7 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
-import uuid from 'uuid';
 
-export default class TripPageLogic {
+export default class StagePageLogic {
   constructor(nav, repo) {
     this.nav = nav;
     this.repo = repo;
@@ -11,32 +10,42 @@ export default class TripPageLogic {
       'close': this.close.bind(this),
       'edit': this.edit.bind(this),
       'view': this.view.bind(this),
-    }, 'ui.trippage');
-    this.publisher = new PubSubPublisher('ui.trippage');
+    }, 'ui.stagepage');
+    this.publisher = new PubSubPublisher('ui.stagepage');
     this.handler.subscribe();
   }
 
   init(realm, type, id, action, data) {
-    data.editMode = false;
-
-    this.repo.getTripById(id).catch(err => {
-      data.editMode = true;
-
-      return this.repo.createNewTrip(id);
+    this.repo.getStageById(id).catch(err => {
+      return null;
     }).then(trip => {
+      data.editMode = false;
       data.obj = trip;
+
+      if (!data.obj) {
+        let d = new Date();
+
+        data.editMode = true;
+        data.obj = {
+          _id: id,
+          type: 'stage',
+          subtype: 'stay',
+          title: 'new ',
+          start: '2017-01-01T12:00:00',
+          end: '2017-01-05T12:00:00'
+        };
+      }
 
       this.viewHandler = new PubSubHandler({
         'edit': this.edit.bind(this),
         'close': this.close.bind(this),
-        'addStage': this.addStage.bind(this),
-      }, `ui.tripview.${id}`);
+      }, `ui.stageview.${id}`);
       this.viewHandler.subscribe();
 
       this.editHandler = new PubSubHandler({
         'view': this.view.bind(this),
         'close': this.close.bind(this)
-      }, `ui.tripedit.${id}`);
+      }, `ui.stageedit.${id}`);
       this.editHandler.subscribe();
 
       data.init = true;
@@ -49,7 +58,7 @@ export default class TripPageLogic {
   }
 
   edit(realm, type, id, action, data) {
-    this.repo.getTripById(id).then(trip => {
+    this.repo.getStageById(id).then(trip => {
       data.obj = trip;
       data.editMode = true;
 
@@ -58,15 +67,11 @@ export default class TripPageLogic {
   }
 
   view(realm, type, id, action, data) {
-    this.repo.getTripById(id).then(trip => {
+    this.repo.getStageById(id).then(trip => {
       data.obj = trip;
       data.editMode = false;
 
       this.publisher.publish(`${id}.update`, data);
     });
-  }
-
-  addStage(realm, type, id, action, data) {
-    this.nav.goToStage(`${id}/stages/${uuid()}`);
   }
 }

@@ -49,7 +49,7 @@ export default class TripList extends Component {
 
     if (this.state && this.state.trips) {
       l = this.state.trips.map(entry => {
-        return <TripListEntry key={entry._id} id={entry._id}/>
+        return <TripListEntry key={entry.id} id={entry.id}/>
       });
     }
 

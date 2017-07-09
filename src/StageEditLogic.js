@@ -1,7 +1,7 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 
-export default class TripEditLogic {
+export default class StageEditLogic {
   constructor(nav, repo) {
     this.nav = nav;
     this.repo = repo;
@@ -12,8 +12,8 @@ export default class TripEditLogic {
       'editTitleStart': this.editTitleStart.bind(this),
       'editTitleEnd': this.editTitleEnd.bind(this),
       'save': this.save.bind(this),
-    }, 'ui.tripedit');
-    this.publisher = new PubSubPublisher('ui.tripedit');
+    }, 'ui.stageedit');
+    this.publisher = new PubSubPublisher('ui.stageedit');
     this.handler.subscribe();
   }
 
@@ -40,8 +40,8 @@ export default class TripEditLogic {
   }
 
   editDatesEnd(realm, type, id, action, data) {
-    data.obj.start = data.dateStart.toISOString();
-    data.obj.end = data.dateEnd.toISOString();
+    data.obj.start = data.dateStart.toLocaleFormat('%Y-%m-%d');
+    data.obj.end = data.dateEnd.toLocaleFormat('%Y-%m-%d');
     data.editDates = false;
 
     this.publisher.publish(`${id}.update`, data);

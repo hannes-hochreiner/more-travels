@@ -17,12 +17,12 @@ export default class TripView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.tripId
+      id: props.stageId
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.tripview.${this.state.id}`);
-    this.publisher = new PubSubPublisher(`ui.tripview.${this.state.id}`);
+    }, `ui.stageview.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.stageview.${this.state.id}`);
   }
 
   componentDidMount() {
@@ -55,7 +55,6 @@ export default class TripView extends Component {
           >
             <MenuItem primaryText="edit" onTouchTap={this.publisher.publish.bind(this.publisher,'edit', this.state)}/>
             <MenuItem primaryText="delete" />
-            <MenuItem primaryText="add stage" onTouchTap={this.publisher.publish.bind(this.publisher,'addStage', this.state)}/>
           </IconMenu>
         }
         onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher,'close', this.state)}

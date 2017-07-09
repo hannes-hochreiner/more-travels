@@ -8,21 +8,20 @@ import Divider from 'material-ui/Divider';
 import AppBar from 'material-ui/AppBar';
 
 import MoreTravelsMuiThemeProvider from './MoreTravelsMuiThemeProvider';
-import StageList from './StageList';
-import TripView from './TripView';
-import TripEdit from './TripEdit';
+import StageView from './StageView';
+import StageEdit from './StageEdit';
 
-export default class TripPage extends Component {
+export default class StagePage extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      id: props.match.params.tripid
+      id: `trips/${props.match.params.tripid}/stages/${props.match.params.stageid}`
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.trippage.${this.state.id}`);
-    this.publisher = new PubSubPublisher(`ui.trippage.${this.state.id}`);
+    }, `ui.stagepage.${this.state.id}`);
+    this.publisher = new PubSubPublisher(`ui.stagepage.${this.state.id}`);
   }
 
   componentDidMount() {
@@ -44,7 +43,7 @@ export default class TripPage extends Component {
     if (!this.state.init) {
       return (
         <MoreTravelsMuiThemeProvider>
-          <div className="TripPage">
+          <div className="StagePage">
             <AppBar
               title="...loading..."
             />
@@ -58,30 +57,24 @@ export default class TripPage extends Component {
 
     if (this.state.editMode) {
       content = [
-        <TripEdit
-          key={`tripedit${this.state.id}`}
-          tripId={this.state.id}
-          trip={this.state.obj}
+        <StageEdit
+          key={`stageedit${this.state.id}`}
+          stageId={this.state.id}
+          stage={this.state.obj}
         />,
       ];
     } else {
       content = [
-        <TripView
-          key={`tripview${this.state.id}`}
-          tripId={this.state.id}
+        <StageView
+          key={`stageview${this.state.id}`}
+          stageId={this.state.id}
         />,
-      <Divider key='divider'/>,
-        <StageList
-          key={`stagelist1`}
-          id='1'
-          tripId={this.state.id}
-        />
       ];
     }
 
     return (
       <MoreTravelsMuiThemeProvider>
-        <div className="TripPage">
+        <div className="StagePage">
           {content}
         </div>
       </MoreTravelsMuiThemeProvider>

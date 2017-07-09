@@ -1,11 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { HashRouter as Router, Route } from 'react-router-dom';
+import { HashRouter as Router, Route, Switch } from 'react-router-dom';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import PouchDb from 'pouchdb';
 
 import App from './App';
 import TripPage from './TripPage';
+import StagePage from './StagePage';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
@@ -20,6 +21,8 @@ import StageListEntryLogic from './StageListEntryLogic';
 import TripViewLogic from './TripViewLogic';
 import TripEditLogic from './TripEditLogic';
 import RepositoryPouchDb from './RepositoryPouchDb';
+import StagePageLogic from './StagePageLogic';
+import StageEditLogic from './StageEditLogic';
 
 let nav = new Navigator();
 let repo = new RepositoryPouchDb(PouchDb);
@@ -31,13 +34,18 @@ new StageListLogic(repo);
 new StageListEntryLogic(nav, repo);
 new TripViewLogic(nav, repo);
 new TripEditLogic(nav, repo);
+new StagePageLogic(nav, repo);
+new StageEditLogic(nav, repo);
 
 injectTapEventPlugin();
 ReactDOM.render(
   <Router>
     <div>
-      <Route exact path="/" component={App}/>
-      <Route path="/trips/:tripid" component={TripPage}/>
+      <Switch>
+        <Route exact path="/" component={App}/>
+        <Route exact path="/trips/:tripid" component={TripPage}/>
+        <Route exact path="/trips/:tripid/stages/:stageid" component={StagePage}/>
+      </Switch>
     </div>
   </Router>, document.getElementById('root')
 );
