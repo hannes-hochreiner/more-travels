@@ -8,5 +8,11 @@ export default class LoggerConsole {
         'data': data
       });
     });
+    PubSub.subscribe('service', (topic, data) => {
+      console.log({
+        'topic': topic,
+        'data': data
+      });
+    });
   }
 }

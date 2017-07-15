@@ -8,12 +8,16 @@ import LinearProgress from 'material-ui/LinearProgress';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import TripListEntry from './TripListEntry';
+import DateTimeEdit from './DateTimeEdit';
+import FlatButton from 'material-ui/FlatButton';
 
 export default class TripList extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.id
+      id: props.id,
+      openDialog: false,
+      date: (new Date()).toISOString().substr(0,16)
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
@@ -64,6 +68,13 @@ export default class TripList extends Component {
         <List>
           {l}
         </List>
+        <FlatButton
+          label="Edit"
+          primary={true}
+          keyboardFocused={true}
+          onTouchTap={() => {this.setState({openDialog: true});}}
+        />
+      <DateTimeEdit id='1' date={this.state.date} timezone='Europe/Berlin' open={this.state.openDialog} onEditEnd={(res) => {console.log(res);this.setState({openDialog: false, date:res});}}/>
         <FloatingActionButton secondary={true} style={style} onTouchTap={this.addTrip.bind(this)}>
           <ContentAdd />
         </FloatingActionButton>

@@ -23,6 +23,7 @@ import TripEditLogic from './TripEditLogic';
 import RepositoryPouchDb from './RepositoryPouchDb';
 import StagePageLogic from './StagePageLogic';
 import StageEditLogic from './StageEditLogic';
+import Timezone from './Timezone';
 
 let nav = new Navigator();
 let repo = new RepositoryPouchDb(PouchDb);
@@ -36,6 +37,7 @@ new TripViewLogic(nav, repo);
 new TripEditLogic(nav, repo);
 new StagePageLogic(nav, repo);
 new StageEditLogic(nav, repo);
+new Timezone();
 
 injectTapEventPlugin();
 ReactDOM.render(
