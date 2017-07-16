@@ -14,11 +14,13 @@ import ActionDateRange from 'material-ui/svg-icons/action/date-range';
 import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
 
+import DateTimeEdit from './DateTimeEdit';
+
 export default class StageEdit extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: this.props.stageId,
+      id: this.props.stageid,
       obj: this.props.stage
     };
     this.handler = new PubSubHandler({
@@ -58,17 +60,38 @@ export default class StageEdit extends Component {
     this.publisher.publish('editTitleEnd', this.state);
   }
 
-  editDatesStart() {
-    this.publisher.publish('editDatesStart', this.state);
+  editStartDateStart() {
+    this.publisher.publish('editStartDateStart', this.state);
   }
 
-  editDatesEnd() {
-    this.publisher.publish('editDatesEnd', this.state);
+  editEndDateStart() {
+    this.publisher.publish('editEndDateStart', this.state);
+  }
+
+  editDateEnd(date, timezone) {
+    let newDte = JSON.parse(JSON.stringify(this.state.dte));
+
+    newDte.date = date;
+    newDte.timezone = timezone;
+
+    this.setState({dte: newDte});
+    this.publisher.publish('editDateEnd', this.state);
   }
 
   render() {
     if (!this.state.init) {
       return <LinearProgress mode="indeterminate" />;
+    }
+
+    let dte = '';
+
+    if (this.state.dte) {
+      dte = <DateTimeEdit
+        id={`${this.state.id}dte`}
+        onEditEnd={this.editDateEnd.bind(this)}
+        timezone={this.state.dte.timezone}
+        date={this.state.dte.date}
+      />;
     }
 
     return (
@@ -85,26 +108,17 @@ export default class StageEdit extends Component {
             onTouchTap={this.editTitleStart.bind(this)}
           />
           <ListItem
-            primaryText={`${this.state.obj.start} - ${this.state.obj.end}`}
+            primaryText={`from: ${this.state.timestampstart}`}
             leftIcon={<ActionDateRange />}
-            onTouchTap={this.editDatesStart.bind(this)}
+            onTouchTap={this.editStartDateStart.bind(this)}
+          />
+          <ListItem
+            primaryText={`to: ${this.state.timestampend}`}
+            leftIcon={<ActionDateRange />}
+            onTouchTap={this.editEndDateStart.bind(this)}
           />
         </List>
-        <Dialog
-          title="Stage dates"
-          actions={[<FlatButton
-            label="Ok"
-            primary={true}
-            keyboardFocused={true}
-            onTouchTap={this.editDatesEnd.bind(this)}
-          />]}
-          modal={false}
-          open={this.state.editDates}
-          onRequestClose={this.editDatesEnd.bind(this)}
-        >
-          <DatePicker onChange={this.changeHandler.bind(this, 'start')} hintText="start date" autoOk={true} value={this.state.dateStart}/>
-          <DatePicker onChange={this.changeHandler.bind(this, 'end')} hintText="end date" autoOk={true} value={this.state.dateEnd}/>
-        </Dialog>
+        {dte}
         <Dialog
           title="Title"
           actions={[<FlatButton

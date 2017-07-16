@@ -16,12 +16,13 @@ export default class StagePage extends Component {
     super(props);
 
     this.state = {
-      id: `trips/${props.match.params.tripid}/stages/${props.match.params.stageid}`
+      tripid: props.match.params.tripid,
+      stageid: props.match.params.stageid
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.stagepage.${this.state.id}`);
-    this.publisher = new PubSubPublisher(`ui.stagepage.${this.state.id}`);
+    }, `ui.stagepage.${this.state.stageid}`);
+    this.publisher = new PubSubPublisher(`ui.stagepage.${this.state.stageid}`);
   }
 
   componentDidMount() {
@@ -58,16 +59,19 @@ export default class StagePage extends Component {
     if (this.state.editMode) {
       content = [
         <StageEdit
-          key={`stageedit${this.state.id}`}
-          stageId={this.state.id}
+          key={`stageedit${this.state.stageid}`}
+          stageid={this.state.stageid}
+          tripid={this.state.tripid}
           stage={this.state.obj}
         />,
       ];
     } else {
       content = [
         <StageView
-          key={`stageview${this.state.id}`}
-          stageId={this.state.id}
+          key={`stageview${this.state.stageid}`}
+          stageid={this.state.stageid}
+          tripid={this.state.tripid}
+          stage={this.state.obj}
         />,
       ];
     }

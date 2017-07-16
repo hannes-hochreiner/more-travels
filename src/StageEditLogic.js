@@ -1,5 +1,6 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
+import { oneShot as psos } from './PubSubOneShot';
 
 export default class StageEditLogic {
   constructor(nav, repo) {
@@ -7,8 +8,9 @@ export default class StageEditLogic {
     this.repo = repo;
     this.handler = new PubSubHandler({
       'init': this.init.bind(this),
-      'editDatesStart': this.editDatesStart.bind(this),
-      'editDatesEnd': this.editDatesEnd.bind(this),
+      'editStartDateStart': this.editStartDateStart.bind(this),
+      'editEndDateStart': this.editEndDateStart.bind(this),
+      'editDateEnd': this.editDateEnd.bind(this),
       'editTitleStart': this.editTitleStart.bind(this),
       'editTitleEnd': this.editTitleEnd.bind(this),
       'save': this.save.bind(this),
@@ -19,32 +21,77 @@ export default class StageEditLogic {
 
   init(realm, type, id, action, data) {
     if (data.obj) {
-      data.init = true;
-      this.publisher.publish(`${id}.update`, data);
+      Promise.all([
+        psos(
+          `service.timezone.${id}start.convertDateTime`,
+          {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone},
+          `service.timezone.${id}start.convertedDateTime`
+        ),
+        psos(
+          `service.timezone.${id}end.convertDateTime`,
+          {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone},
+          `service.timezone.${id}end.convertedDateTime`
+        ),
+      ]).then(res => {
+        this.publisher.publish(`${id}.update`, {
+          init: true,
+          timestampstart: `${res[0].dateTime} (${data.obj.timestampstart.timezone})`,
+          timestampend: `${res[1].dateTime} (${data.obj.timestampend.timezone})`,
+        });
+      });
+
       return;
     }
+  }
 
-    this.repo.getTripById(id).then(trip => {
-      data.obj = trip;
-      data.init = true;
-      this.publisher.publish(`${id}.update`, data);
+  editStartDateStart(realm, type, id, action, data) {
+    data.dte = {
+      date: data.obj.timestampstart.datetime,
+      timezone: data.obj.timestampstart.timezone,
+      type: 'start'
+    }
+
+    this.publisher.publish(`${id}.update`, data);
+  }
+
+  editEndDateStart(realm, type, id, action, data) {
+    data.dte = {
+      date: data.obj.timestampend.datetime,
+      timezone: data.obj.timestampend.timezone,
+      type: 'end'
+    }
+
+    this.publisher.publish(`${id}.update`, data);
+  }
+
+  editDateEnd(realm, type, id, action, data) {
+    if (data.dte.type === 'start') {
+      data.obj.timestampstart.datetime = data.dte.date;
+      data.obj.timestampstart.timezone = data.dte.timezone;
+    } else if (data.dte.type === 'end') {
+      data.obj.timestampend.datetime = data.dte.date;
+      data.obj.timestampend.timezone = data.dte.timezone;
+    }
+
+    delete data.dte;
+
+    Promise.all([
+      psos(
+        `service.timezone.${id}start.convertDateTime`,
+        {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone},
+        `service.timezone.${id}start.convertedDateTime`
+      ),
+      psos(
+        `service.timezone.${id}end.convertDateTime`,
+        {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone},
+        `service.timezone.${id}end.convertedDateTime`
+      ),
+    ]).then(res => {
+      this.publisher.publish(`${id}.update`, {
+        timestampstart: `${res[0].dateTime} (${data.obj.timestampstart.timezone})`,
+        timestampend: `${res[1].dateTime} (${data.obj.timestampend.timezone})`,
+      });
     });
-  }
-
-  editDatesStart(realm, type, id, action, data) {
-    data.editDates = true;
-    data.dateStart = new Date(data.obj.start);
-    data.dateEnd = new Date(data.obj.end);
-
-    this.publisher.publish(`${id}.update`, data);
-  }
-
-  editDatesEnd(realm, type, id, action, data) {
-    data.obj.start = data.dateStart.toLocaleFormat('%Y-%m-%d');
-    data.obj.end = data.dateEnd.toLocaleFormat('%Y-%m-%d');
-    data.editDates = false;
-
-    this.publisher.publish(`${id}.update`, data);
   }
 
   editTitleStart(realm, type, id, action, data) {

@@ -16,15 +16,15 @@
 ### stage: stay
   * title
   * location
-  * start timestamp
-  * end timestamp
+  * timestampStart
+  * timestampEnd
 
 ### stage: travel
   * title
-  * start location
-  * end location
-  * start timestamp
-  * end timestamp
+  * locationStart
+  * locationEnd
+  * timestampStart
+  * timestampEnd
 
 ### timestamp
   * datetime: in UTC, format: 'YYYY-MM-DD HH:mm', e.g. '2017-07-02 15:04'

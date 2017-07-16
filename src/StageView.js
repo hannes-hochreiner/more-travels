@@ -13,16 +13,18 @@ import { List, ListItem } from 'material-ui/List';
 import ActionDateRange from 'material-ui/svg-icons/action/date-range';
 import LinearProgress from 'material-ui/LinearProgress';
 
-export default class TripView extends Component {
+export default class StageView extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.stageId
+      tripid: props.tripid,
+      stageid: props.stageid,
+      obj: props.stage,
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.stageview.${this.state.id}`);
-    this.publisher = new PubSubPublisher(`ui.stageview.${this.state.id}`);
+    }, `ui.stageview.${this.state.stageid}`);
+    this.publisher = new PubSubPublisher(`ui.stageview.${this.state.stageid}`);
   }
 
   componentDidMount() {
@@ -62,7 +64,7 @@ export default class TripView extends Component {
       <List>
         <ListItem
           disabled={true}
-          primaryText={`${this.state.obj.start} - ${this.state.obj.end}`}
+          primaryText={`${this.state.timestampstart} - ${this.state.timestampend}`}
           leftIcon={<ActionDateRange />}
         />
       </List>

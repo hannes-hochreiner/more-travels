@@ -16,25 +16,13 @@ export default class StagePageLogic {
   }
 
   init(realm, type, id, action, data) {
-    this.repo.getStageById(id).catch(err => {
-      return null;
-    }).then(trip => {
-      data.editMode = false;
-      data.obj = trip;
+    data.editMode = false;
+    this.repo.getStageByTripIdId(data.tripid, data.stageid).catch(err => {
+      data.editMode = true;
 
-      if (!data.obj) {
-        let d = new Date();
-
-        data.editMode = true;
-        data.obj = {
-          _id: id,
-          type: 'stage',
-          subtype: 'stay',
-          title: 'new ',
-          start: '2017-01-01T12:00:00',
-          end: '2017-01-05T12:00:00'
-        };
-      }
+      return this.repo.createNewStage(data.tripid, data.stageid);
+    }).then(stage => {
+      data.obj = stage;
 
       this.viewHandler = new PubSubHandler({
         'edit': this.edit.bind(this),
@@ -58,8 +46,8 @@ export default class StagePageLogic {
   }
 
   edit(realm, type, id, action, data) {
-    this.repo.getStageById(id).then(trip => {
-      data.obj = trip;
+    this.repo.getStageByTripIdId(data.tripid, data.stageid).then(stage => {
+      data.obj = stage;
       data.editMode = true;
 
       this.publisher.publish(`${id}.update`, data);
@@ -67,8 +55,8 @@ export default class StagePageLogic {
   }
 
   view(realm, type, id, action, data) {
-    this.repo.getStageById(id).then(trip => {
-      data.obj = trip;
+    this.repo.getStageByTripIdId(data.tripid, data.stageid).then(stage => {
+      data.obj = stage;
       data.editMode = false;
 
       this.publisher.publish(`${id}.update`, data);

@@ -10,6 +10,9 @@ import TimePicker from 'material-ui/TimePicker';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 
+/**
+ @usage: <DateTimeEdit id='1' onEditEnd={editEnd} date={date} timezone={timezone} open={dteOpen} />
+*/
 export default class DateTimeEdit extends Component {
   constructor(props) {
     super(props);
@@ -78,7 +81,7 @@ export default class DateTimeEdit extends Component {
       `service.timezone.${this.props.id}.convertedDateTime`
     ).then(res => {
       if (typeof this.props.onEditEnd === 'function') {
-        this.props.onEditEnd(res.dateTime);
+        this.props.onEditEnd(res.dateTime, this.state.timezone);
       }
     });
   }
@@ -101,42 +104,39 @@ export default class DateTimeEdit extends Component {
     }
 
     return (
-      <div>
-        {this.state.equivalentLocalDate}
-        <Dialog
-          title="Trip dates"
-          actions={[<FlatButton
-            label="Ok"
-            primary={true}
-            keyboardFocused={true}
-            onTouchTap={this.onEditEnd.bind(this)}
-          />]}
-          modal={false}
-          open={this.props.open}
-          onRequestClose={this.onEditEnd.bind(this)}
+      <Dialog
+        title="Trip dates"
+        actions={[<FlatButton
+          label="Ok"
+          primary={true}
+          keyboardFocused={true}
+          onTouchTap={this.onEditEnd.bind(this)}
+        />]}
+        modal={false}
+        open={true}
+        onRequestClose={this.onEditEnd.bind(this)}
+      >
+        <DatePicker
+          floatingLabelText="date"
+          value={this.state._dateObj}
+          onChange={this.handleDateChange.bind(this)}
+        />
+        <TimePicker
+          floatingLabelText="time"
+          value={this.state._timeObj}
+          onChange={this.handleTimeChange.bind(this)}
+          format="24hr"
+        />
+        <SelectField
+          floatingLabelText="timezone"
+          value={this.state.timezone}
+          onChange={this.handleTimezoneChange.bind(this)}
         >
-          <DatePicker
-            floatingLabelText="date"
-            value={this.state._dateObj}
-            onChange={this.handleDateChange.bind(this)}
-          />
-          <TimePicker
-            floatingLabelText="time"
-            value={this.state._timeObj}
-            onChange={this.handleTimeChange.bind(this)}
-            format="24hr"
-          />
-          <SelectField
-            floatingLabelText="timezone"
-            value={this.state.timezone}
-            onChange={this.handleTimezoneChange.bind(this)}
-          >
-            {this.state.timezones.map(zone => {
-              return <MenuItem key={zone} value={zone} primaryText={zone} />;
-            })}
-          </SelectField>
-        </Dialog>
-      </div>
+          {this.state.timezones.map(zone => {
+            return <MenuItem key={zone} value={zone} primaryText={zone} />;
+          })}
+        </SelectField>
+      </Dialog>
     );
   }
 }

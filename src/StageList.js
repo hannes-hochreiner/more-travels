@@ -42,7 +42,7 @@ export default class StageList extends Component {
 
     if (this.state && this.state.stages) {
       l = this.state.stages.map(entry => {
-        return <StageListEntry key={entry._id} id={entry._id}/>
+        return <StageListEntry key={entry._id} tripid={entry.tripid} stageid={entry.stageid}/>
       });
     }
 

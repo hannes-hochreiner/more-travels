@@ -12,12 +12,13 @@ export default class TripListEntry extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id: props.id
+      tripid: props.tripid,
+      stageid: props.stageid,
     };
     this.handler = new PubSubHandler({
       'update': this.update.bind(this)
-    }, `ui.stagelistentry.${this.state.id}`);
-    this.publisher = new PubSubPublisher(`ui.stagelistentry.${this.state.id}`);
+    }, `ui.stagelistentry.${this.state.stageid}`);
+    this.publisher = new PubSubPublisher(`ui.stagelistentry.${this.state.stageid}`);
   }
 
   componentDidMount() {
@@ -43,7 +44,7 @@ export default class TripListEntry extends Component {
     }
 
     return (
-      <ListItem key={this.state.obj.id} primaryText={`${this.state.obj.title}`} leftIcon={this.state.obj.type === 'place' ? <MapsPlace/> : <MapsDirections/>} />
+      <ListItem key={this.state.obj.id} primaryText={`${this.state.obj.title}`} leftIcon={this.state.obj.subtype === 'stay' ? <MapsPlace/> : <MapsDirections/>} />
     );
   }
 }

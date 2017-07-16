@@ -67,6 +67,6 @@ export default class TripPageLogic {
   }
 
   addStage(realm, type, id, action, data) {
-    this.nav.goToStage(`${id}/stages/${uuid()}`);
+    this.nav.goToStage(id, uuid());
   }
 }

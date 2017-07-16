@@ -41,6 +41,21 @@ export default class RepositoryPouchDb {
     return this._getObjById(`stages/${tripId}/${id}`);
   }
 
+  createNewStage(tripId, id) {
+    return new Promise((resolve, reject) => {
+      resolve({
+        _id: `stages/${tripId}/${id}`,
+        stageid: id,
+        tripid: tripId,
+        type: 'stage',
+        subtype: 'stay',
+        title: 'new stay',
+        timestampstart: {datetime: '2017-01-01 12:00', timezone: 'Europe/Berlin'},
+        timestampend: {datetime: '2017-01-05 12:00', timezone: 'Europe/Berlin'}
+      });
+    });
+  }
+
   updateObject(obj) {
     return this.pouch.put(obj);
   }
