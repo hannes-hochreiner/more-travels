@@ -39,9 +39,17 @@ export default class TripEditLogic {
     this.publisher.publish(`${id}.update`, data);
   }
 
+  _getLocalDate(date) {
+    return [
+      `${date.getFullYear()}`,
+      `${date.getMonth() + 1}`,
+      `${date.getDate()}`
+    ].map(t => t.length === 1 ? '0' + t : t).join('-');
+  }
+
   editDatesEnd(realm, type, id, action, data) {
-    data.obj.start = data.dateStart.toISOString();
-    data.obj.end = data.dateEnd.toISOString();
+    data.obj.start = this._getLocalDate(data.dateStart);
+    data.obj.end = this._getLocalDate(data.dateEnd);
     data.editDates = false;
 
     this.publisher.publish(`${id}.update`, data);
