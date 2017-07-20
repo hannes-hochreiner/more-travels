@@ -42,7 +42,7 @@ export default class StagePageLogic {
   }
 
   close(realm, type, id, action, data) {
-    this.nav.goToTripList();
+    this.nav.goToTrip(data.obj.tripid);
   }
 
   edit(realm, type, id, action, data) {

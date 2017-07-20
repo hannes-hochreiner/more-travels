@@ -7,6 +7,7 @@ export default class StageListEntryLogic {
     this.repo = repo;
     this.handler = new PubSubHandler({
       'init': this.init.bind(this),
+      'open': this.open.bind(this),
     }, 'ui.stagelistentry');
     this.handler.subscribe();
     this.publisher = new PubSubPublisher('ui.stagelistentry');
@@ -18,5 +19,9 @@ export default class StageListEntryLogic {
       data.obj = stage;
       this.publisher.publish(`${id}.update`, data);
     });
+  }
+
+  open(realm, type, id, action, data) {
+    this.nav.goToStage(data.obj.tripid, data.obj.stageid);
   }
 }
