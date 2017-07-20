@@ -55,7 +55,7 @@ export default class StagePageLogic {
   }
 
   view(realm, type, id, action, data) {
-    this.repo.getStageByTripIdId(data.tripid, data.stageid).then(stage => {
+    this.repo.getStageByTripIdId(data.obj.tripid, data.obj.stageid).then(stage => {
       data.obj = stage;
       data.editMode = false;
 
