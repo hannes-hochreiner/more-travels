@@ -16,6 +16,17 @@ export default class TripListLogic {
 
   init(realm, type, id, action, data) {
     this.repo.getAllTrips().then(trips => {
+      trips.sort((t1, t2) => {
+        if (t1.start < t2.start) {
+          return 1;
+        }
+
+        if (t1.start > t2.start) {
+          return -1;
+        }
+
+        return 0;
+      });
       data.init = true;
       data.trips = trips;
       this.publisher.publish(`${id}.update`, data);
