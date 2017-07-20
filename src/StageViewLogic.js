@@ -1,6 +1,7 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 import { oneShot as psos } from './PubSubOneShot';
+import uuid from 'uuid';
 
 export default class StageViewLogic {
   constructor(nav, repo) {
@@ -15,22 +16,25 @@ export default class StageViewLogic {
 
   init(realm, type, id, action, data) {
     if (data.obj) {
+      let fReqId1 = uuid();
+      let fReqId2 = uuid();
+
       Promise.all([
         psos(
-          `service.timezone.${id}start.convertDateTime`,
-          {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone},
-          `service.timezone.${id}start.convertedDateTime`
+          `service.format.${fReqId1}.timestampFull`,
+          {timestamp: data.obj.timestampstart},
+          `service.format.${fReqId1}.formattedTimestampFull`
         ),
         psos(
-          `service.timezone.${id}end.convertDateTime`,
-          {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone},
-          `service.timezone.${id}end.convertedDateTime`
+          `service.format.${fReqId2}.timestampFull`,
+          {timestamp: data.obj.timestampend},
+          `service.format.${fReqId2}.formattedTimestampFull`
         ),
       ]).then(res => {
         this.publisher.publish(`${id}.update`, {
           init: true,
-          timestampstart: `${res[0].dateTime} (${data.obj.timestampstart.timezone})`,
-          timestampend: `${res[1].dateTime} (${data.obj.timestampend.timezone})`,
+          timestampstart: res[0].timestamp,
+          timestampend: res[1].timestamp,
         });
       });
 

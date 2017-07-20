@@ -1,5 +1,7 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
+import { oneShot as psos } from './PubSubOneShot';
+import uuid from 'uuid';
 
 export default class StageListEntryLogic {
   constructor(nav, repo) {
@@ -17,6 +19,25 @@ export default class StageListEntryLogic {
     this.repo.getStageByTripIdId(data.tripid, data.stageid).then(stage => {
       data.init = true;
       data.obj = stage;
+
+      let fReqId1 = uuid();
+      let fReqId2 = uuid();
+
+      return Promise.all([
+        psos(
+          `service.format.${fReqId1}.timestampFull`,
+          {timestamp: data.obj.timestampstart},
+          `service.format.${fReqId1}.formattedTimestampFull`
+        ),
+        psos(
+          `service.format.${fReqId2}.timestampFull`,
+          {timestamp: data.obj.timestampend},
+          `service.format.${fReqId2}.formattedTimestampFull`
+        ),
+      ]);
+    }).then(res => {
+      data.timestampstart = res[0].timestamp;
+      data.timestampend = res[1].timestamp;
       this.publisher.publish(`${id}.update`, data);
     });
   }

@@ -24,7 +24,8 @@ import RepositoryPouchDb from './RepositoryPouchDb';
 import StagePageLogic from './StagePageLogic';
 import StageEditLogic from './StageEditLogic';
 import StageViewLogic from './StageViewLogic';
-import Timezone from './Timezone';
+import ServiceTimezone from './ServiceTimezone';
+import ServiceFormat from './ServiceFormat';
 
 let nav = new Navigator();
 let repo = new RepositoryPouchDb(PouchDb);
@@ -39,7 +40,8 @@ new TripEditLogic(nav, repo);
 new StagePageLogic(nav, repo);
 new StageEditLogic(nav, repo);
 new StageViewLogic(nav, repo);
-new Timezone();
+new ServiceTimezone();
+new ServiceFormat();
 
 injectTapEventPlugin();
 ReactDOM.render(

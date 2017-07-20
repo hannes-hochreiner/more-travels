@@ -47,6 +47,7 @@ export default class TripListEntry extends Component {
       <ListItem
         key={this.state.obj.id}
         primaryText={`${this.state.obj.title}`}
+        secondaryText={`${this.state.timestampstart} - ${this.state.timestampend}`}
         leftIcon={this.state.obj.subtype === 'stay' ? <MapsPlace/> : <MapsDirections/>}
         onTouchTap={this.open.bind(this)}
       />

@@ -4,7 +4,7 @@ import PubSubPublisher from './PubSubPublisher';
 import tz from 'timezone';
 import tzZones from 'timezone/zones';
 
-export default class Timezone {
+export default class ServiceTimezone {
   constructor(nav, repo) {
     this.psh = new PubSubHandler({
       'convertDateTime': this.convertDateTime.bind(this),
