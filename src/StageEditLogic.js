@@ -1,6 +1,7 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 import { oneShot as psos } from './PubSubOneShot';
+import uuid from 'uuid';
 
 export default class StageEditLogic {
   constructor(nav, repo) {
@@ -126,7 +127,27 @@ export default class StageEditLogic {
   }
 
   save(realm, type, id, action, data) {
-    this.repo.updateObject(data.obj).then(() => {
+    this.repo.updateObject(data.obj).then(res => {
+      let mapReqIdS = uuid();
+      let mapReqIdE = uuid();
+
+      return Promise.all([
+        psos(
+          `service.map.${mapReqIdS}.locationRequest`,
+          data.obj.locationstart,
+          `service.map.${mapReqIdS}.locationResponse`
+        ),
+        psos(
+          `service.map.${mapReqIdE}.locationRequest`,
+          data.obj.locationend,
+          `service.map.${mapReqIdE}.locationResponse`
+        ),
+      ]);
+    }).then(res => {
+      return this.repo.updateAttachmentOnObject(data.obj, 'maps/locationstart', res[0].map, 'image/png').then(() => {
+        return this.repo.updateAttachmentOnObject(data.obj, 'maps/locationend', res[1].map, 'image/png');
+      });
+    }).then(res => {
       this.publisher.publish(`${id}.view`, data);
     });
   }

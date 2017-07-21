@@ -30,12 +30,22 @@ export default class StageViewLogic {
           {timestamp: data.obj.timestampend},
           `service.format.${fReqId2}.formattedTimestampFull`
         ),
+        this.repo.getAttachmentOnObject(data.obj, 'maps/locationstart').catch(() => { return; }),
+        this.repo.getAttachmentOnObject(data.obj, 'maps/locationend').catch(() => { return; }),
       ]).then(res => {
-        this.publisher.publish(`${id}.update`, {
-          init: true,
-          timestampstart: res[0].timestamp,
-          timestampend: res[1].timestamp,
-        });
+        data.init = true;
+        data.timestampstart = res[0].timestamp;
+        data.timestampend = res[1].timestamp;
+
+        if (res[2]) {
+          data.locationstartmap = res[2];
+        }
+
+        if (res[3]) {
+          data.locationendmap = res[3];
+        }
+
+        this.publisher.publish(`${id}.update`, data);
       });
 
       return;

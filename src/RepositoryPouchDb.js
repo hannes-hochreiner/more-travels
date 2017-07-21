@@ -58,7 +58,19 @@ export default class RepositoryPouchDb {
   }
 
   updateObject(obj) {
-    return this.pd.put(obj);
+    return this.pd.put(obj).then(res => {
+      obj._rev = res.rev;
+    });
+  }
+
+  updateAttachmentOnObject(obj, attachmentId, attachmentData, attachmentType) {
+    return this.pd.putAttachment(obj._id, attachmentId, obj._rev, attachmentData, attachmentType).then(res => {
+      obj._rev = res.rev;
+    });
+  }
+
+  getAttachmentOnObject(obj, attachmentId) {
+    return this.pd.getAttachment(obj._id, attachmentId, {rev: obj._rev});
   }
 
   _getObjById(id) {

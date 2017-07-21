@@ -30,6 +30,7 @@ import ServiceTimezone from './ServiceTimezone';
 import ServiceFormat from './ServiceFormat';
 import ServiceConfiguration from './ServiceConfiguration';
 import ConfPageLogic from './ConfPageLogic';
+import ServiceMap from './ServiceMap';
 
 let nav = new Navigator();
 let repo = new RepositoryPouchDb(PouchDb);
@@ -49,6 +50,7 @@ new ServiceTimezone();
 new ServiceFormat();
 new ServiceConfiguration(repo);
 new ConfPageLogic(nav, repo);
+new ServiceMap();
 
 injectTapEventPlugin();
 ReactDOM.render(

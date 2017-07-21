@@ -9,9 +9,8 @@ import IconMenu from 'material-ui/IconMenu';
 import MenuItem from 'material-ui/MenuItem';
 import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
-import { List, ListItem } from 'material-ui/List';
-import ActionDateRange from 'material-ui/svg-icons/action/date-range';
 import LinearProgress from 'material-ui/LinearProgress';
+import {GridList, GridTile} from 'material-ui/GridList';
 
 export default class StageView extends Component {
   constructor(props) {
@@ -25,6 +24,7 @@ export default class StageView extends Component {
       'update': this.update.bind(this)
     }, `ui.stageview.${this.state.stageid}`);
     this.publisher = new PubSubPublisher(`ui.stageview.${this.state.stageid}`);
+    this.objectUrls = {};
   }
 
   componentDidMount() {
@@ -34,6 +34,16 @@ export default class StageView extends Component {
 
   componentWillUnmount() {
     this.handler.unsubscribe();
+    this.freeObjectUrls();
+  }
+
+  freeObjectUrls() {
+    for (let prop in this.objectUrls) {
+      if (this.objectUrls.hasOwnProperty(prop)) {
+        URL.revokeObjectURL(this.objectUrls[prop]);
+        delete this.objectUrls[prop];
+      }
+    }
   }
 
   update(realm, type, id, action, data) {
@@ -43,6 +53,20 @@ export default class StageView extends Component {
   render() {
     if (!this.state.init) {
       return <LinearProgress mode="indeterminate" />;
+    }
+
+    this.freeObjectUrls();
+
+    if (this.state.locationstartmap) {
+      this.objectUrls['locationstartmap'] = URL.createObjectURL(this.state.locationstartmap) || '';
+    } else {
+      this.objectUrls['locationstartmap'] = '';
+    }
+
+    if (this.state.locationendmap) {
+      this.objectUrls['locationendmap'] = URL.createObjectURL(this.state.locationendmap);
+    } else {
+      this.objectUrls['locationendmap'] = '';
     }
 
     return <div>
@@ -61,13 +85,16 @@ export default class StageView extends Component {
         }
         onLeftIconButtonTouchTap={this.publisher.publish.bind(this.publisher,'close', this.state)}
       />
-      <List>
-        <ListItem
-          disabled={true}
-          primaryText={`${this.state.timestampstart} - ${this.state.timestampend}`}
-          leftIcon={<ActionDateRange />}
-        />
-      </List>
+      <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', }}>
+        <GridList style={{width: 600, height: 600, overflowY: 'auto',}} cellHeight={300}>
+          <GridTile key={'start'} title={this.state.obj.locationstart.title} subtitle={<span>{this.state.timestampstart}</span>}>
+            <img src={this.objectUrls['locationstartmap']}/>
+          </GridTile>
+          <GridTile key={'end'} title={this.state.obj.locationend.title} subtitle={<span>{this.state.timestampend}</span>}>
+            <img src={this.objectUrls['locationendmap']}/>
+          </GridTile>
+        </GridList>
+      </div>
     </div>;
   }
 }
