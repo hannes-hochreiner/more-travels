@@ -12,4 +12,8 @@ export default class Navigator {
   goToTripList() {
     (new Router()).history.push(`/`);
   }
+
+  goToConfiguration() {
+    (new Router()).history.push(`/conf`);
+  }
 }

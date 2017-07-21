@@ -4,7 +4,7 @@ import { oneShot as psos } from './PubSubOneShot';
 import uuid from 'uuid';
 
 export default class ServiceFormat {
-  constructor(nav, repo) {
+  constructor() {
     this.psh = new PubSubHandler({
       'timestampFull': this.timestampFull.bind(this),
     }, 'service.format');

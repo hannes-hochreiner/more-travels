@@ -7,9 +7,11 @@ import PouchDb from 'pouchdb';
 import App from './App';
 import TripPage from './TripPage';
 import StagePage from './StagePage';
+import ConfPage from './ConfPage';
 import registerServiceWorker from './registerServiceWorker';
 import './index.css';
 
+import AppLogic from './AppLogic';
 import Navigator from './Navigator';
 import RepositoryMock from './RepositoryMock';
 import LoggerConsole from './LoggerConsole';
@@ -26,10 +28,13 @@ import StageEditLogic from './StageEditLogic';
 import StageViewLogic from './StageViewLogic';
 import ServiceTimezone from './ServiceTimezone';
 import ServiceFormat from './ServiceFormat';
+import ServiceConfiguration from './ServiceConfiguration';
+import ConfPageLogic from './ConfPageLogic';
 
 let nav = new Navigator();
 let repo = new RepositoryPouchDb(PouchDb);
 new LoggerConsole();
+new AppLogic(nav, repo);
 new TripListLogic(nav, repo);
 new TripListEntryLogic(nav, repo);
 new TripPageLogic(nav, repo);
@@ -42,6 +47,8 @@ new StageEditLogic(nav, repo);
 new StageViewLogic(nav, repo);
 new ServiceTimezone();
 new ServiceFormat();
+new ServiceConfiguration(repo);
+new ConfPageLogic(nav, repo);
 
 injectTapEventPlugin();
 ReactDOM.render(
@@ -49,6 +56,7 @@ ReactDOM.render(
     <div>
       <Switch>
         <Route exact path="/" component={App}/>
+        <Route exact path="/conf" component={ConfPage}/>
         <Route exact path="/trips/:tripid" component={TripPage}/>
         <Route exact path="/trips/:tripid/stages/:stageid" component={StagePage}/>
       </Switch>

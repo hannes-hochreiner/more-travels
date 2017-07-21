@@ -1,10 +1,11 @@
 export default class RepositoryPouchDb {
   constructor(PouchDb) {
-    this.pouch = new PouchDb('more-travels_data');
+    this.pd = new PouchDb('more-travels_data');
+    this.pc = new PouchDb('more-travels_conf');
   }
 
   getAllTrips() {
-    return this.pouch.allDocs({
+    return this.pd.allDocs({
       startkey: `trips/`,
       endkey: `trips/\uffff`,
       include_docs: true
@@ -28,7 +29,7 @@ export default class RepositoryPouchDb {
   }
 
   getStagesByTripId(tripId) {
-    return this.pouch.allDocs({
+    return this.pd.allDocs({
       startkey: `stages/${tripId}/`,
       endkey: `stages/${tripId}/\uffff`,
       include_docs: true
@@ -57,10 +58,27 @@ export default class RepositoryPouchDb {
   }
 
   updateObject(obj) {
-    return this.pouch.put(obj);
+    return this.pd.put(obj);
   }
 
   _getObjById(id) {
-    return this.pouch.get(id);
+    return this.pd.get(id);
+  }
+
+  getMapboxConf() {
+    return this.pc.get('conf/mapbox');
+  }
+
+  createMapboxConf() {
+    return new Promise((resolve, reject) => {
+      resolve({
+        _id: 'conf/mapbox',
+        authKey: ''
+      });
+    });
+  }
+
+  updateMapboxConf(conf) {
+    return this.pc.put(conf);
   }
 }

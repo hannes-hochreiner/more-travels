@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "mapbox-gl": "^0.38.0",
     "material-ui": "^0.18.3",
     "pouchdb": "^6.2.0",
     "pubsub-js": "^1.5.7",

@@ -14,6 +14,9 @@ export default class StageEditLogic {
       'editTitleStart': this.editTitleStart.bind(this),
       'editTitleEnd': this.editTitleEnd.bind(this),
       'save': this.save.bind(this),
+      'editStartLocationStart': this.editStartLocationStart.bind(this),
+      'editEndLocationStart': this.editEndLocationStart.bind(this),
+      'editLocationEnd': this.editLocationEnd.bind(this),
     }, 'ui.stageedit');
     this.publisher = new PubSubPublisher('ui.stageedit');
     this.handler.subscribe();
@@ -33,11 +36,25 @@ export default class StageEditLogic {
           `service.timezone.${id}end.convertedDateTime`
         ),
       ]).then(res => {
-        this.publisher.publish(`${id}.update`, {
+        let state = {
           init: true,
           timestampstart: `${res[0].dateTime} (${data.obj.timestampstart.timezone})`,
           timestampend: `${res[1].dateTime} (${data.obj.timestampend.timezone})`,
-        });
+        };
+
+        if (data.obj.locationstart) {
+          state.locationstart = data.obj.locationstart.title;
+        } else {
+          state.locationstart = '';
+        }
+
+        if (data.obj.locationend) {
+          state.locationend = data.obj.locationend.title;
+        } else {
+          state.locationend = '';
+        }
+
+        this.publisher.publish(`${id}.update`, state);
       });
 
       return;
@@ -112,5 +129,70 @@ export default class StageEditLogic {
     this.repo.updateObject(data.obj).then(() => {
       this.publisher.publish(`${id}.view`, data);
     });
+  }
+
+  editStartLocationStart(realm, type, id, action, data) {
+    let le = {
+      title: '',
+      latitude: 0,
+      longitude: 0,
+      zoom: 0,
+    };
+
+    if (data.obj.locationstart) {
+      le = data.obj.locationstart;
+    }
+
+    le.type = 'start';
+    data.le = le;
+    this.publisher.publish(`${id}.update`, data);
+  }
+
+  editEndLocationStart(realm, type, id, action, data) {
+    let le = {
+      title: '',
+      latitude: 0,
+      longitude: 0,
+      zoom: 0,
+    };
+
+    if (data.obj.locationend) {
+      le = data.obj.locationend;
+    }
+
+    le.type = 'end';
+    data.le = le;
+    this.publisher.publish(`${id}.update`, data);
+  }
+
+  editLocationEnd(realm, type, id, action, data) {
+    let loc = {
+      title: data.title,
+      longitude: data.longitude,
+      latitude: data.latitude,
+      zoom: data.zoom
+    };
+
+    if (data.state.le.type === 'start') {
+      data.state.obj.locationstart = loc;
+    } else if (data.state.le.type === 'end') {
+      data.state.obj.locationend = loc;
+    }
+
+    if (data.state.obj.locationstart) {
+      data.state.locationstart = data.state.obj.locationstart.title;
+    } else {
+      data.state.locationstart = '';
+    }
+
+    if (data.state.obj.locationend) {
+      data.state.locationend = data.state.obj.locationend.title;
+    } else {
+      data.state.locationend = '';
+    }
+
+    delete data.state.le;
+
+    this.publisher.publish(`${id}.update`, data.state);
   }
 }

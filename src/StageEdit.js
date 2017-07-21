@@ -11,10 +11,12 @@ import Dialog from 'material-ui/Dialog';
 import DatePicker from 'material-ui/DatePicker';
 import { List, ListItem } from 'material-ui/List';
 import ActionDateRange from 'material-ui/svg-icons/action/date-range';
+import MapsPlace from 'material-ui/svg-icons/maps/place';
 import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
 
 import DateTimeEdit from './DateTimeEdit';
+import LocationEdit from './LocationEdit';
 
 export default class StageEdit extends Component {
   constructor(props) {
@@ -68,6 +70,24 @@ export default class StageEdit extends Component {
     this.publisher.publish('editEndDateStart', this.state);
   }
 
+  editStartLocationStart() {
+    this.publisher.publish('editStartLocationStart', this.state);
+  }
+
+  editEndLocationStart() {
+    this.publisher.publish('editEndLocationStart', this.state);
+  }
+
+  editLocationEnd(title, longitude, latitude, zoom) {
+    this.publisher.publish('editLocationEnd', {
+      state: this.state,
+      title: title,
+      longitude: longitude,
+      latitude: latitude,
+      zoom: zoom
+    });
+  }
+
   editDateEnd(date, timezone) {
     let newDte = JSON.parse(JSON.stringify(this.state.dte));
 
@@ -94,6 +114,19 @@ export default class StageEdit extends Component {
       />;
     }
 
+    let le = '';
+
+    if (this.state.le) {
+      le = <LocationEdit
+        id={`${this.state.id}le`}
+        onEditEnd={this.editLocationEnd.bind(this)}
+        title={this.state.le.title}
+        latitude={this.state.le.latitude}
+        longitude={this.state.le.longitude}
+        zoom={this.state.le.zoom}
+      />;
+    }
+
     return (
       <div>
         <AppBar
@@ -117,8 +150,19 @@ export default class StageEdit extends Component {
             leftIcon={<ActionDateRange />}
             onTouchTap={this.editEndDateStart.bind(this)}
           />
+          <ListItem
+            primaryText={`from: ${this.state.locationstart}`}
+            leftIcon={<MapsPlace />}
+            onTouchTap={this.editStartLocationStart.bind(this)}
+          />
+          <ListItem
+            primaryText={`to: ${this.state.locationend}`}
+            leftIcon={<MapsPlace />}
+            onTouchTap={this.editEndLocationStart.bind(this)}
+          />
         </List>
         {dte}
+        {le}
         <Dialog
           title="Title"
           actions={[<FlatButton
