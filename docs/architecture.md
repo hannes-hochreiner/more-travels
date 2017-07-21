@@ -32,8 +32,9 @@
 
 ### location
   * title
-  * lat
-  * long
+  * latitude
+  * longitude
+  * zoom
 
 ## URL schema
   * /trips
