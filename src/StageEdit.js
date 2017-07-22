@@ -8,7 +8,6 @@ import IconButton from 'material-ui/IconButton';
 import NavigationClose from 'material-ui/svg-icons/navigation/close';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
-import DatePicker from 'material-ui/DatePicker';
 import { List, ListItem } from 'material-ui/List';
 import ActionDateRange from 'material-ui/svg-icons/action/date-range';
 import MapsPlace from 'material-ui/svg-icons/maps/place';
