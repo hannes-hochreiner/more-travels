@@ -2,6 +2,7 @@
   "name": "more-travels",
   "version": "0.1.4",
   "private": true,
+  "homepage": "https://hannes-hochreiner.github.io/more-travels",
   "dependencies": {
     "axios": "^0.16.2",
     "mapbox-gl": "^0.38.0",
