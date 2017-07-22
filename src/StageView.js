@@ -88,10 +88,10 @@ export default class StageView extends Component {
       <div style={{display: 'flex', flexWrap: 'wrap', justifyContent: 'space-around', }}>
         <GridList style={{width: 600, height: 600, overflowY: 'auto',}} cellHeight={300}>
           <GridTile key={'start'} title={this.state.obj.locationstart.title} subtitle={<span>{this.state.timestampstart}</span>}>
-            <img src={this.objectUrls['locationstartmap']}/>
+            <img alt='' src={this.objectUrls['locationstartmap']}/>
           </GridTile>
           <GridTile key={'end'} title={this.state.obj.locationend.title} subtitle={<span>{this.state.timestampend}</span>}>
-            <img src={this.objectUrls['locationendmap']}/>
+            <img alt='' src={this.objectUrls['locationendmap']}/>
           </GridTile>
         </GridList>
       </div>

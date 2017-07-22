@@ -1,6 +1,5 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
-import uuid from 'uuid';
 
 export default class ConvPageLogic {
   constructor(nav, repo) {

@@ -1,10 +1,5 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 
-import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
-
-import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
 import TextField from 'material-ui/TextField';

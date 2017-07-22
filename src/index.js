@@ -13,7 +13,6 @@ import './index.css';
 
 import AppLogic from './AppLogic';
 import Navigator from './Navigator';
-import RepositoryMock from './RepositoryMock';
 import LoggerConsole from './LoggerConsole';
 import TripListLogic from './TripListLogic';
 import TripListEntryLogic from './TripListEntryLogic';

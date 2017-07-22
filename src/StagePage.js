@@ -4,7 +4,6 @@ import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 
 import LinearProgress from 'material-ui/LinearProgress';
-import Divider from 'material-ui/Divider';
 import AppBar from 'material-ui/AppBar';
 
 import MoreTravelsMuiThemeProvider from './MoreTravelsMuiThemeProvider';

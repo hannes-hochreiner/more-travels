@@ -8,8 +8,6 @@ import LinearProgress from 'material-ui/LinearProgress';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import TripListEntry from './TripListEntry';
-import DateTimeEdit from './DateTimeEdit';
-import FlatButton from 'material-ui/FlatButton';
 
 export default class TripList extends Component {
   constructor(props) {
