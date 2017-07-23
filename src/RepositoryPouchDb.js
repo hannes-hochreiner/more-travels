@@ -9,23 +9,40 @@ export default class RepositoryPouchDb {
       startkey: `trips/`,
       endkey: `trips/\uffff`,
       include_docs: true
-    }).then(res => res.rows.map(entry => entry.doc));
+    }).then(res => res.rows.map(entry => {
+      let obj = entry.doc;
+
+      this._addAdditionalKeys(obj, this._getTripAdditionalKeys());
+      return obj;
+    }));
   }
 
   createNewTrip(id) {
     return new Promise((resolve, reject) => {
-      resolve({
+      let newTrip = {
         _id: `trips/${id}`,
         id: id,
-        title: 'new trip',
-        start: '2017-01-01',
-        end: '2017-01-02'
-      });
+      };
+
+      this._addAdditionalKeys(newTrip, this._getTripAdditionalKeys());
+      resolve(newTrip);
     });
   }
 
   getTripById(id) {
-    return this._getObjById(`trips/${id}`);
+    return this._getObjById(`trips/${id}`).then(obj => {
+      this._addAdditionalKeys(obj, this._getTripAdditionalKeys());
+
+      return obj;
+    });
+  }
+
+  _getTripAdditionalKeys() {
+    return {
+      title: 'new trip',
+      start: '2017-01-01',
+      end: '2017-01-02',
+    };
   }
 
   getStagesByTripId(tripId) {
@@ -34,26 +51,73 @@ export default class RepositoryPouchDb {
       endkey: `stages/${tripId}/\uffff`,
       include_docs: true
     }).then(res => {
-      return res.rows.map(entry => entry.doc);
+      return res.rows.map(entry => {
+        let obj = entry.doc;
+
+        this._addAdditionalKeys(obj, this._getStageAdditionalKeys());
+        return obj;
+      });
     });
   }
 
   getStageByTripIdId(tripId, id) {
-    return this._getObjById(`stages/${tripId}/${id}`);
+    return this._getObjById(`stages/${tripId}/${id}`).then(obj => {
+      this._addAdditionalKeys(obj, this._getStageAdditionalKeys());
+
+      return obj;
+    });
+  }
+
+  _getLocationAdditionalKeys() {
+    return {
+      title: 'new location',
+      latitude: 0,
+      longitude: 0,
+      zoom: 0
+    };
+  }
+
+  _getTimestampAdditionalKeys() {
+    return {
+      datetime: '2017-01-01 12:00',
+      timezone: 'Europe/Berlin'
+    };
+  }
+
+  _getStageAdditionalKeys() {
+    return {
+      type: 'stage',
+      subtype: 'stay',
+      title: 'new stay',
+      timestampstart: this._getTimestampAdditionalKeys(),
+      timestampend: this._getTimestampAdditionalKeys(),
+      locationstart: this._getLocationAdditionalKeys(),
+      locationend: this._getLocationAdditionalKeys(),
+    };
+  }
+
+  _addAdditionalKeys(obj, addKeys) {
+    Object.keys(addKeys).forEach(key => {
+      if (obj[key]) {
+        if (typeof obj[key] === 'object') {
+          this._addAdditionalKeys(obj[key], addKeys[key]);
+        }
+      } else {
+        obj[key] = addKeys[key];
+      }
+    });
   }
 
   createNewStage(tripId, id) {
     return new Promise((resolve, reject) => {
-      resolve({
+      let newStage = {
         _id: `stages/${tripId}/${id}`,
         stageid: id,
         tripid: tripId,
-        type: 'stage',
-        subtype: 'stay',
-        title: 'new stay',
-        timestampstart: {datetime: '2017-01-01 12:00', timezone: 'Europe/Berlin'},
-        timestampend: {datetime: '2017-01-05 12:00', timezone: 'Europe/Berlin'}
-      });
+      };
+
+      this._addAdditionalKeys(newStage, this._getStageAdditionalKeys());
+      resolve(newStage);
     });
   }
 
