@@ -33,6 +33,10 @@ export default class LocationEdit extends Component {
       {},
       `service.configuration.${psId}.mapboxAuthToken`
     ).then(res => {
+      if (!res.mapboxAuthToken || res.mapboxAuthToken === '') {
+        return;
+      }
+
       mapboxgl.accessToken = res.mapboxAuthToken;
       let mapboxOptions = {
         container: this.mapDiv,
@@ -60,11 +64,21 @@ export default class LocationEdit extends Component {
 
   onEditEnd(evnt, val) {
     if (typeof this.props.onEditEnd === 'function') {
+      let longitude = this.props.longitude;
+      let latitude = this.props.latitude;
+      let zoom = this.props.zoom;
+
+      if (this.map) {
+        longitude = this.map.getCenter().lng;
+        latitude = this.map.getCenter().lat;
+        zoom = this.map.getZoom();
+      }
+
       this.props.onEditEnd(
         this.state.title,
-        this.map.getCenter().lng,
-        this.map.getCenter().lat,
-        this.map.getZoom(),
+        longitude,
+        latitude,
+        zoom,
       );
     }
   }
