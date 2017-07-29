@@ -1,21 +1,26 @@
-import PubSubHandler from './PubSubHandler';
-import PubSubPublisher from './PubSubPublisher';
+import PubSub from 'pubsub-js';
 
 export default class ServiceConfiguration {
   constructor(repo) {
     this.repo = repo;
-    this.psh = new PubSubHandler({
-      'getMapboxAuthToken': this.getMapboxAuthToken.bind(this),
-    }, 'service.configuration');
-    this.psp = new PubSubPublisher('service.configuration');
-    this.psh.subscribe();
+
+    PubSub.subscribe('service.configuration.getMapboxAuthToken.request', this.getMapboxAuthToken.bind(this));
   }
 
-  getMapboxAuthToken(realm, type, id, action, data) {
+  getMapboxAuthToken(topic, data) {
+    let baseTopic = 'service.configuration.getMapboxAuthToken';
+    let id = topic.split('.')[4];
+
     this.repo.getMapboxConf().then(res => {
-      this.psp.publish(`${id}.mapboxAuthToken`, {
-        mapboxAuthToken: res.authKey
-      });
+      PubSub.publish(
+        `${baseTopic}.response.${id}`,
+        { mapboxAuthToken: res.authKey }
+      );
+    }).catch(error => {
+      PubSub.publish(
+        `${baseTopic}.error.${id}`,
+        error
+      );
     });
   }
 }

@@ -1,29 +1,51 @@
-import PubSubHandler from './PubSubHandler';
-import PubSubPublisher from './PubSubPublisher';
+import PubSub from 'pubsub-js';
 
 import tz from 'timezone';
 import tzZones from 'timezone/zones';
 
 export default class ServiceTimezone {
   constructor() {
-    this.psh = new PubSubHandler({
-      'convertDateTime': this.convertDateTime.bind(this),
-      'getZones': this.getZones.bind(this),
-    }, 'service.timezone');
-    this.psp = new PubSubPublisher('service.timezone');
-    this.psh.subscribe();
     this.tz = tz(tzZones);
     this.tzones = this._extractZones(tzZones);
+
+    PubSub.subscribe('service.timezone.convertDateTime.request', this.convertDateTime.bind(this));
+    PubSub.subscribe('service.timezone.getZones.request', this.getZones.bind(this));
   }
 
-  convertDateTime(realm, type, id, action, data) {
-    let dt = this.tz(this.tz(data.dateTime, data.fromTimezone), '%F %T', data.toTimezone).substr(0, 16);
+  convertDateTime(topic, data) {
+    let baseTopic = 'service.timezone.convertDateTime';
+    let id = topic.split('.')[4];
 
-    this.psp.publish(`${id}.convertedDateTime`, {dateTime: dt});
+    try {
+      let dt = this.tz(this.tz(data.dateTime, data.fromTimezone), '%F %T', data.toTimezone).substr(0, 16);
+
+      PubSub.publish(
+        `${baseTopic}.response.${id}`,
+        {dateTime: dt}
+      );
+    } catch (error) {
+      PubSub.publish(
+        `${baseTopic}.error.${id}`,
+        error
+      );
+    }
   }
 
-  getZones(realm, type, id, action, data) {
-    this.psp.publish(`${id}.zones`, {zones: this.tzones});
+  getZones(topic, data) {
+    let baseTopic = 'service.timezone.getZones';
+    let id = topic.split('.')[4];
+
+    try {
+      PubSub.publish(
+        `${baseTopic}.response.${id}`,
+        {zones: this.tzones}
+      );
+    } catch (error) {
+      PubSub.publish(
+        `${baseTopic}.error.${id}`,
+        error
+      );
+    }
   }
 
   _extractZones(zones, prev) {

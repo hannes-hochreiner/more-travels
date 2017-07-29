@@ -1,7 +1,6 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
 
 export default class StageViewLogic {
   constructor(nav, repo) {
@@ -16,19 +15,14 @@ export default class StageViewLogic {
 
   init(realm, type, id, action, data) {
     if (data.obj) {
-      let fReqId1 = uuid();
-      let fReqId2 = uuid();
-
       Promise.all([
         psos(
-          `service.format.${fReqId1}.timestampFull`,
-          {timestamp: data.obj.timestampstart},
-          `service.format.${fReqId1}.formattedTimestampFull`
+          `service.format.timestampFull`,
+          {timestamp: data.obj.timestampstart}
         ),
         psos(
-          `service.format.${fReqId2}.timestampFull`,
-          {timestamp: data.obj.timestampend},
-          `service.format.${fReqId2}.formattedTimestampFull`
+          `service.format.timestampFull`,
+          {timestamp: data.obj.timestampend}
         ),
         this.repo.getAttachmentOnObject(data.obj, 'maps/locationstart').catch(() => { return; }),
         this.repo.getAttachmentOnObject(data.obj, 'maps/locationend').catch(() => { return; }),

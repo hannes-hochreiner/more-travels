@@ -1,7 +1,6 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
 
 export default class StageListEntryLogic {
   constructor(nav, repo) {
@@ -20,19 +19,14 @@ export default class StageListEntryLogic {
       data.init = true;
       data.obj = stage;
 
-      let fReqId1 = uuid();
-      let fReqId2 = uuid();
-
       return Promise.all([
         psos(
-          `service.format.${fReqId1}.timestampFull`,
+          `service.format.timestampFull`,
           {timestamp: data.obj.timestampstart},
-          `service.format.${fReqId1}.formattedTimestampFull`
         ),
         psos(
-          `service.format.${fReqId2}.timestampFull`,
+          `service.format.timestampFull`,
           {timestamp: data.obj.timestampend},
-          `service.format.${fReqId2}.formattedTimestampFull`
         ),
       ]);
     }).then(res => {

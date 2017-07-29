@@ -1,28 +1,24 @@
-import PubSubHandler from './PubSubHandler';
-import PubSubPublisher from './PubSubPublisher';
+import PubSub from 'pubsub-js';
 import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
 
 export default class ServiceFormat {
   constructor() {
-    this.psh = new PubSubHandler({
-      'timestampFull': this.timestampFull.bind(this),
-    }, 'service.format');
-    this.psp = new PubSubPublisher('service.format');
-    this.psh.subscribe();
+    PubSub.subscribe('service.format.timestampFull.request', this.timestampFull.bind(this));
   }
 
-  timestampFull(realm, type, id, action, data) {
-    let tzReqId = uuid();
+  timestampFull(topic, data) {
+    let baseTopic = 'service.format.timestampFull';
+    let id = topic.split('.')[4];
 
     psos(
-      `service.timezone.${tzReqId}.convertDateTime`,
-      {dateTime: data.timestamp.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.timestamp.timezone},
-      `service.timezone.${tzReqId}.convertedDateTime`
+      `service.timezone.convertDateTime`,
+      {dateTime: data.timestamp.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.timestamp.timezone}
     ).then(res => {
-      this.psp.publish(`${id}.formattedTimestampFull`, {
+      PubSub.publish(`${baseTopic}.response.${id}`, {
         timestamp: `${res.dateTime} (${data.timestamp.timezone})`
       });
+    }).catch(error => {
+      PubSub.publish(`${baseTopic}.error.${id}`, error);
     });
   }
 }

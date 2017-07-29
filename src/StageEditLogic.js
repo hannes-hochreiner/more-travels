@@ -1,7 +1,6 @@
 import PubSubHandler from './PubSubHandler';
 import PubSubPublisher from './PubSubPublisher';
 import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
 
 export default class StageEditLogic {
   constructor(nav, repo) {
@@ -27,14 +26,12 @@ export default class StageEditLogic {
     if (data.obj) {
       Promise.all([
         psos(
-          `service.timezone.${id}start.convertDateTime`,
-          {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone},
-          `service.timezone.${id}start.convertedDateTime`
+          `service.timezone.convertDateTime`,
+          {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone}
         ),
         psos(
-          `service.timezone.${id}end.convertDateTime`,
-          {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone},
-          `service.timezone.${id}end.convertedDateTime`
+          `service.timezone.convertDateTime`,
+          {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone}
         ),
       ]).then(res => {
         let state = {
@@ -95,14 +92,12 @@ export default class StageEditLogic {
 
     Promise.all([
       psos(
-        `service.timezone.${id}start.convertDateTime`,
-        {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone},
-        `service.timezone.${id}start.convertedDateTime`
+        `service.timezone.convertDateTime`,
+        {dateTime: data.obj.timestampstart.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampstart.timezone}
       ),
       psos(
-        `service.timezone.${id}end.convertDateTime`,
-        {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone},
-        `service.timezone.${id}end.convertedDateTime`
+        `service.timezone.convertDateTime`,
+        {dateTime: data.obj.timestampend.datetime, fromTimezone: 'Etc/UTC', toTimezone: data.obj.timestampend.timezone}
       ),
     ]).then(res => {
       this.publisher.publish(`${id}.update`, {
@@ -128,25 +123,22 @@ export default class StageEditLogic {
 
   save(realm, type, id, action, data) {
     this.repo.updateObject(data.obj).then(res => {
-      let mapReqIdS = uuid();
-      let mapReqIdE = uuid();
-
       return Promise.all([
         psos(
-          `service.map.${mapReqIdS}.locationRequest`,
-          data.obj.locationstart,
-          `service.map.${mapReqIdS}.locationResponse`
+          `service.map.getLocation`,
+          data.obj.locationstart
         ),
         psos(
-          `service.map.${mapReqIdE}.locationRequest`,
-          data.obj.locationend,
-          `service.map.${mapReqIdE}.locationResponse`
+          `service.map.getLocation`,
+          data.obj.locationend
         ),
       ]);
     }).then(res => {
       return this.repo.updateAttachmentOnObject(data.obj, 'maps/locationstart', res[0].map, 'image/png').then(() => {
         return this.repo.updateAttachmentOnObject(data.obj, 'maps/locationend', res[1].map, 'image/png');
       });
+    }).catch(error => {
+      console.log(error);
     }).then(res => {
       this.publisher.publish(`${id}.view`, data);
     });

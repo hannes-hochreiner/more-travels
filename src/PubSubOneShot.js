@@ -1,12 +1,20 @@
 import PubSub from 'pubsub-js';
+import uuid from 'uuid';
 
-export function oneShot(reqTopic, reqData, respTopic) {
+export function oneShot(topic, data) {
   return new Promise((resolve, reject) => {
-    let token = PubSub.subscribe(respTopic, (topic, data) => {
-      PubSub.unsubscribe(token);
-      resolve(data);
+    let id = uuid();
+    let respToken = PubSub.subscribe(`${topic}.response.${id}`, (respTopic, respData) => {
+      PubSub.unsubscribe(respToken);
+      PubSub.unsubscribe(errToken);
+      resolve(respData);
+    });
+    let errToken = PubSub.subscribe(`${topic}.error.${id}`, (respTopic, respData) => {
+      PubSub.unsubscribe(respToken);
+      PubSub.unsubscribe(errToken);
+      reject(respData);
     });
 
-    PubSub.publish(reqTopic, reqData);
+    PubSub.publish(`${topic}.request.${id}`, data);
   });
 }

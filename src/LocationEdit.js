@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 
 import { oneShot as psos } from './PubSubOneShot';
-import uuid from 'uuid';
 
 import Dialog from 'material-ui/Dialog';
 import FlatButton from 'material-ui/FlatButton';
@@ -26,12 +25,9 @@ export default class LocationEdit extends Component {
   }
 
   componentDidMount() {
-    let psId = uuid();
-
     psos(
-      `service.configuration.${psId}.getMapboxAuthToken`,
-      {},
-      `service.configuration.${psId}.mapboxAuthToken`
+      `service.configuration.getMapboxAuthToken`,
+      {}
     ).then(res => {
       if (!res.mapboxAuthToken || res.mapboxAuthToken === '') {
         return;
